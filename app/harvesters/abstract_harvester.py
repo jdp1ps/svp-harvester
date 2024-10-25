@@ -5,6 +5,7 @@ from typing import Optional, AsyncGenerator, Type, List
 from asyncpg import PostgresConnectionError
 from loguru import logger
 from semver import Version, VersionInfo
+from sqlalchemy.exc import TimeoutError as SqlTimeoutError
 
 from app.api.dependencies.event_types import event_types_or_default
 from app.db.daos.entity_dao import EntityDAO
@@ -203,6 +204,8 @@ class AbstractHarvester(ABC):  # pylint: disable=too-many-instance-attributes
             await self.handle_error(error)
         # Database failure
         except (ConnectionError, PostgresConnectionError) as connection_error:
+            await self.handle_error(connection_error)
+        except SqlTimeoutError as connection_error:
             await self.handle_error(connection_error)
         # this is for debugging purpose only
         # as no other exception types are expected during normal execution
