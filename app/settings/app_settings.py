@@ -54,7 +54,7 @@ class AppSettings(BaseSettings):
     amqp_task_parallelism_limit: int = 50
     amqp_exchange_name: str = "publications"
     amqp_prefetch_count: int = 50
-    amqp_consumer_ack_timeout: int = 43200000
+    amqp_consumer_ack_timeout: int = 180000
     amqp_retrieval_routing_key: str = "task.entity.references.retrieval"
     amqp_reference_event_routing_key: str = "event.references.reference.*"
     amqp_harvesting_event_routing_key: str = "event.references.harvesting.state"
