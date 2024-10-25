@@ -51,9 +51,9 @@ class AppSettings(BaseSettings):
     amqp_host: str = "127.0.0.1"
     amqp_queue_name: str = "svp-harvester"
     amqp_wait_before_shutdown: int = 30
-    amqp_task_parallelism_limit: int = 50
+    amqp_task_parallelism_limit: int = 5
     amqp_exchange_name: str = "publications"
-    amqp_prefetch_count: int = 50
+    amqp_prefetch_count: int = 5
     amqp_consumer_ack_timeout: int = 180000
     amqp_retrieval_routing_key: str = "task.entity.references.retrieval"
     amqp_reference_event_routing_key: str = "event.references.reference.*"
@@ -75,7 +75,8 @@ class AppSettings(BaseSettings):
     db_password: str = "secret"
     db_host: str = "localhost"
     db_port: int = 5432
-    db_pool_size: int = 100
+    db_pool_size: int = 20
+    max_overflow: int = 10
 
     scanr_es_host: str = "https://host_name.com/"
     scanr_es_user: str = "johndoe"

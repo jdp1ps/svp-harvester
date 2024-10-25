@@ -27,7 +27,7 @@ else:  # pragma: no cover
         future=True,
         echo=False,
         pool_size=settings.db_pool_size,
-        max_overflow=2000,
+        max_overflow=settings.max_overflow,
         pool_timeout=60,
         pool_pre_ping=True,
         pool_recycle=900,
