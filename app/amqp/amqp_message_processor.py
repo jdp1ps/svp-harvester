@@ -64,7 +64,9 @@ class AMQPMessageProcessor:
             logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
         except (ConnectionError, PostgresConnectionError) as connection_error:
             await message.nack(requeue=True)
-            logger.error(f"Connection refused during {worker_id} message processing")
+            logger.error(
+                f"Connection refused during {worker_id} message processing : {connection_error}"
+            )
         except Exception as exception:
             await message.nack(requeue=True)
             logger.error(
