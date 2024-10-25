@@ -24,5 +24,5 @@ class Issue(BaseModel):
 
     @field_validator("number", mode="before")
     @classmethod
-    def filter_none_values(cls, v):
+    def _filter_none_values(cls, v):
         return [num for num in v if num is not None]
