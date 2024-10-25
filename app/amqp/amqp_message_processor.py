@@ -72,7 +72,8 @@ class AMQPMessageProcessor:
                     f"Unexpected exception during {worker_id} message processing : {exception}"
                 )
             finally:
-                await message.nack(requeue=True)
+                if message is not None and not message.processed:
+                    await message.nack(requeue=True)
 
     async def _process_message(self, payload: str, timeout=DEFAULT_RESULT_TIMEOUT):
         json_payload = json.loads(payload)
