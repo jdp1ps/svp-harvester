@@ -7,7 +7,6 @@ license = "Cecill"
 readme = "README.md"
 repository = "https://github.com/CRISalid-esr/svp-harvester"
 documentation = "https://svp-harvester.readthedocs.io/en/latest/harvesters/hal.html"
-package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
