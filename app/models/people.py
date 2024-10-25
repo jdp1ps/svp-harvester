@@ -8,6 +8,8 @@ from pydantic_core.core_schema import ValidationInfo
 from app.config import get_app_settings
 from app.models.entities import Entity
 
+BIBLIOGRAPHIC_IDENTIFIERS = ["idref", "id_hal_i", "id_hal_s", "orcid", "scopus_eid"]
+
 
 class Person(Entity):
     """
@@ -71,3 +73,12 @@ class Person(Entity):
             f"{', '.join([identifier_type.get('key') for identifier_type in settings.identifiers])}"
         )
         return data
+
+    def has_no_bibliographic_identifiers(self):
+        """
+        Check if the person has no bibliographic identifiers
+        """
+        return not any(
+            identifier.type in BIBLIOGRAPHIC_IDENTIFIERS
+            for identifier in self.identifiers
+        )

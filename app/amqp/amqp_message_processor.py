@@ -4,6 +4,7 @@ from datetime import datetime
 
 import aio_pika
 from aio_pika import IncomingMessage
+from asyncpg import PostgresConnectionError
 from loguru import logger
 from pydantic import ValidationError
 
@@ -61,10 +62,15 @@ class AMQPMessageProcessor:
         except KeyboardInterrupt:
             await message.nack(requeue=True)
             logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
+        except (ConnectionError, PostgresConnectionError) as connection_error:
+            await message.nack(requeue=True)
+            logger.error(
+                f"Connection refused during {worker_id} message processing : {connection_error}"
+            )
         except Exception as exception:
             await message.nack(requeue=True)
             logger.error(
-                f"Exception during {worker_id} message processing : {exception}"
+                f"Unexpected exception during {worker_id} message processing : {exception}"
             )
             raise exception
 
@@ -82,6 +88,16 @@ class AMQPMessageProcessor:
                         "error": True,
                         "message": f"Entity validation error,"
                         f" retrieval aborted: {validation_error}",
+                        "parameters": json_payload,
+                    }
+                )
+                return
+            if person.has_no_bibliographic_identifiers():
+                await self.publisher.publish(
+                    {
+                        "type": "Retrieval",
+                        "error": True,
+                        "message": "No identifiers provided, retrieval aborted",
                         "parameters": json_payload,
                     }
                 )
