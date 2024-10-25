@@ -61,19 +61,18 @@ class AMQPMessageProcessor:
                         f"in {end_time - start_time} for payload {payload}"
                     )
             except KeyboardInterrupt as keyboard_interrupt:
-                await message.nack(requeue=True)
                 logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
                 raise keyboard_interrupt
             except (ConnectionError, PostgresConnectionError) as connection_error:
-                await message.nack(requeue=True)
                 logger.error(
                     f"Connection refused during {worker_id} message processing : {connection_error}"
                 )
             except Exception as exception:
-                await message.nack(requeue=True)
                 logger.error(
                     f"Unexpected exception during {worker_id} message processing : {exception}"
                 )
+            finally:
+                await message.nack(requeue=True)
 
     async def _process_message(self, payload: str, timeout=DEFAULT_RESULT_TIMEOUT):
         json_payload = json.loads(payload)
