@@ -90,6 +90,16 @@ class AMQPMessageProcessor:
                     }
                 )
                 return
+            if person.has_no_bibliographic_identifiers():
+                await self.publisher.publish(
+                    {
+                        "type": "Retrieval",
+                        "error": True,
+                        "message": "No identifiers provided, retrieval aborted",
+                        "parameters": json_payload,
+                    }
+                )
+                return
             service = RetrievalService(
                 identifiers_safe_mode=json_payload.get("identifiers_safe_mode"),
                 nullify=json_payload.get("nullify"),

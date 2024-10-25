@@ -14,6 +14,7 @@ def test_person_without_identifiers(person_without_identifiers: Person):
     """
     assert person_without_identifiers.name == "John Doe"
     assert person_without_identifiers.get_identifier("idref") is None
+    assert person_without_identifiers.has_no_bibliographic_identifiers()
 
 
 def test_person_with_name_and_idref(person_with_name_and_idref: Person):
@@ -25,6 +26,7 @@ def test_person_with_name_and_idref(person_with_name_and_idref: Person):
     """
     assert person_with_name_and_idref.name == "John Doe"
     assert person_with_name_and_idref.get_identifier("idref") == "123456789"
+    assert not person_with_name_and_idref.has_no_bibliographic_identifiers()
 
 
 def test_person_with_invalid_identifier(
