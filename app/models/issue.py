@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.models.journal import Journal
 
@@ -21,3 +21,8 @@ class Issue(BaseModel):
     date: str | None = None
 
     journal: Journal
+
+    @field_validator("number", mode="before")
+    @classmethod
+    def filter_none_values(cls, v):
+        return [num for num in v if num is not None]
