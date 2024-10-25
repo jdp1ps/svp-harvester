@@ -159,13 +159,13 @@ class AbstractHarvester(ABC):  # pylint: disable=too-many-instance-attributes
                         or (new_ref_is_enhanced and self.fetch_enhancements)
                     ):
                         await self.converter.convert(raw_data=raw_data, new_ref=new_ref)
-                    reference_event: Optional[
-                        ReferenceEvent
-                    ] = await self._handle_converted_result(
-                        new_ref=new_ref,
-                        old_ref=old_ref,
-                        comparaison_hash=comparaison_hash,
-                        references_recorder=references_recorder,
+                    reference_event: Optional[ReferenceEvent] = (
+                        await self._handle_converted_result(
+                            new_ref=new_ref,
+                            old_ref=old_ref,
+                            comparaison_hash=comparaison_hash,
+                            references_recorder=references_recorder,
+                        )
                     )
                     if reference_event is not None:
                         await self._put_in_queue(
@@ -324,6 +324,7 @@ class AbstractHarvester(ABC):  # pylint: disable=too-many-instance-attributes
                 "message": str(error),
             }
         )
+        raise error
 
     async def _put_in_queue(self, message: dict) -> None:
         """
