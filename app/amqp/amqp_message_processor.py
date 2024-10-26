@@ -10,6 +10,7 @@ from pydantic import ValidationError
 
 from app.amqp.amqp_message_publisher import AMQPMessagePublisher
 from app.db.models.retrieval import Retrieval
+from app.harvesters.exceptions.invalid_entity_error import InvalidEntityError
 from app.models.people import Person
 from app.services.retrieval.retrieval_service import RetrievalService
 from app.settings.app_settings import AppSettings
@@ -47,6 +48,8 @@ class AMQPMessageProcessor:
         message: IncomingMessage | None = None
 
         while True:
+            requeue = False
+            start_time = None
             try:
                 message = await self.tasks_queue.get()
                 start_time = datetime.now()
@@ -55,25 +58,31 @@ class AMQPMessageProcessor:
                     await self._process_message(payload)
                     await message.ack()
                     self.tasks_queue.task_done()
-                    end_time = datetime.now()
-                    logger.warning(
-                        f"Performance : Message  processed by {worker_id} "
-                        f"in {end_time - start_time} for payload {payload}"
-                    )
             except KeyboardInterrupt as keyboard_interrupt:
                 logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
+                await message.nack(requeue=True)
                 raise keyboard_interrupt
+            except InvalidEntityError as invalid_entity_error:
+                logger.error(f"Invalid entity submitted : {invalid_entity_error}")
+                requeue = False
             except (ConnectionError, PostgresConnectionError) as connection_error:
                 logger.error(
                     f"Connection refused during {worker_id} message processing : {connection_error}"
                 )
+                requeue = True
             except Exception as exception:
                 logger.error(
                     f"Unexpected exception during {worker_id} message processing : {exception}"
                 )
             finally:
                 if message is not None and not message.processed:
-                    await message.nack(requeue=True)
+                    await message.nack(requeue=requeue)
+                    self.tasks_queue.task_done()
+                end_time = datetime.now()
+                logger.warning(
+                    f"Performance : Message  processed by {worker_id} "
+                    f"in {end_time - start_time} for payload {payload}"
+                )
 
     async def _process_message(self, payload: str, timeout=DEFAULT_RESULT_TIMEOUT):
         json_payload = json.loads(payload)
@@ -92,7 +101,10 @@ class AMQPMessageProcessor:
                         "parameters": json_payload,
                     }
                 )
-                return
+                raise InvalidEntityError(
+                    f"Entity validation error: {validation_error} in {json_payload}"
+                ) from validation_error
+
             if person.has_no_bibliographic_identifiers():
                 await self.publisher.publish(
                     {
@@ -102,12 +114,12 @@ class AMQPMessageProcessor:
                         "parameters": json_payload,
                     }
                 )
-                return
+                raise InvalidEntityError("No identifiers provided in {json_payload}")
             service = RetrievalService(
-                identifiers_safe_mode=json_payload.get("identifiers_safe_mode"),
-                nullify=json_payload.get("nullify"),
-                harvesters=json_payload.get("harvesters"),
-                events=json_payload.get("events"),
+                identifiers_safe_mode=json_payload.get("identifiers_safe_mode", False),
+                nullify=json_payload.get("nullify", False),
+                harvesters=json_payload.get("harvesters", []),
+                events=json_payload.get("events", []),
             )
             # Create a queue to get results back
             if reply_expected:
