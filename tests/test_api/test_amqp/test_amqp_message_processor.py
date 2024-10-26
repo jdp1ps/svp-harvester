@@ -1,4 +1,5 @@
 """Test the references API."""
+
 from unittest import mock
 
 import pytest
@@ -41,7 +42,7 @@ async def fixture_message_processor() -> AMQPMessageProcessor:
     return await amqp_connexion._message_processor()
 
 
-@pytest.mark.asyncio
+@pytest.mark.current
 async def test_amqp_message_runs_retrieval_service(
     message_processor: AMQPMessageProcessor,
     mock_retrieval_service_init,
@@ -63,9 +64,9 @@ async def test_amqp_message_runs_retrieval_service(
         mock_retrieval_service_register.assert_called_once()
         _, init_args = mock_retrieval_service_init.call_args
         _, register_args = mock_retrieval_service_register.call_args
-        assert init_args["identifiers_safe_mode"] is None
-        assert init_args["nullify"] is None
-        assert init_args["events"] is None
+        assert init_args["identifiers_safe_mode"] is False
+        assert init_args["nullify"] is False
+        assert init_args["events"] == []
         # register args is a dict and it as pydantic person under 'entity' key
         assert isinstance(register_args["entity"], Person)
         assert register_args["entity"].name == "Doe, John"
