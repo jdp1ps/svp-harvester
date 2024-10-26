@@ -327,7 +327,6 @@ class AbstractHarvester(ABC):  # pylint: disable=too-many-instance-attributes
                 "message": str(error),
             }
         )
-        raise error
 
     async def _put_in_queue(self, message: dict) -> None:
         """
