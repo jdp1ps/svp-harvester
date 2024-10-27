@@ -5,6 +5,7 @@ from datetime import datetime
 
 import aio_pika
 from aio_pika import IncomingMessage
+from aiormq import ChannelInvalidStateError, AMQPError
 from asyncpg import PostgresConnectionError
 from loguru import logger
 from pydantic import ValidationError
@@ -59,6 +60,11 @@ class AMQPMessageProcessor:
                     await self._process_message(payload)
                     await message.ack()
                     self.tasks_queue.task_done()
+            except (AMQPError, ChannelInvalidStateError) as ack_error:
+                logger.error(
+                    f"Channel invalid state error during {worker_id} "
+                    f"message ack: {ack_error}"
+                )
             except KeyboardInterrupt as keyboard_interrupt:
                 logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
                 await message.nack(requeue=True)
@@ -71,14 +77,19 @@ class AMQPMessageProcessor:
                     f"Connection refused during {worker_id} message processing : {connection_error}"
                 )
                 requeue = True
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.error(
                     f"Unexpected exception during {worker_id} message processing: {e}"
                 )
                 logger.error(traceback.format_exc())
             finally:
                 if message is not None and not message.processed:
-                    await message.nack(requeue=requeue)
+                    try:
+                        await message.nack(requeue=requeue)
+                    except (AMQPError, ChannelInvalidStateError) as nack_error:
+                        logger.error(
+                            f"Error during message nack for {worker_id} : {nack_error}"
+                        )
                     self.tasks_queue.task_done()
                 end_time = datetime.now()
                 logger.warning(
