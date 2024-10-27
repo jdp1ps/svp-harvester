@@ -26,7 +26,7 @@ class ReferenceManifestation(Base):
         back_populates="manifestations",
         lazy="raise",
     )
-    reference_id: Mapped[int] = mapped_column(ForeignKey("references.id"))
+    reference_id: Mapped[int] = mapped_column(ForeignKey("references.id"), index=True)
 
     def _validate_url(self, key, url) -> str:
         """
