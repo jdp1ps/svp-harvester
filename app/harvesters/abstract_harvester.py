@@ -210,7 +210,7 @@ class AbstractHarvester(ABC):  # pylint: disable=too-many-instance-attributes
             await self.handle_error(connection_error)
         # this is for debugging purpose only
         # as no other exception types are expected during normal execution
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             logger.error(f"Unexpected exception during harvester run : {e}")
             logger.error(traceback.format_exc())
             await self.handle_error(e)
