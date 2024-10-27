@@ -18,4 +18,4 @@ class ReferenceIdentifier(Base):
     reference: Mapped["app.db.models.reference.Reference"] = relationship(
         "app.db.models.reference.Reference", back_populates="identifiers", lazy="raise"
     )
-    reference_id: Mapped[int] = mapped_column(ForeignKey("references.id"))
+    reference_id: Mapped[int] = mapped_column(ForeignKey("references.id"), index=True)

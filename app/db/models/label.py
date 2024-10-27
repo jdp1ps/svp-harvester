@@ -15,7 +15,7 @@ class Label(Base):
     value: Mapped[str] = mapped_column(nullable=False, index=True)
     language: Mapped[str] = mapped_column(nullable=True, index=True)
 
-    concept_id: Mapped[int] = mapped_column(ForeignKey("concepts.id"))
+    concept_id: Mapped[int] = mapped_column(ForeignKey("concepts.id"), index=True)
     concept: Mapped["app.db.models.concept.Concept"] = relationship(
         "app.db.models.concept.Concept", back_populates="labels", lazy="raise"
     )
