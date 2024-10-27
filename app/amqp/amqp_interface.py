@@ -1,7 +1,10 @@
 import asyncio
+from asyncio import sleep
 
 import aio_pika
 from aio_pika import ExchangeType
+from loguru import logger
+from starlette.datastructures import State
 
 from app.amqp.amqp_message_processor import AMQPMessageProcessor
 from app.settings.app_settings import AppSettings
@@ -15,9 +18,17 @@ class AMQPInterface:
 
     INNER_TASKS_QUEUE_LENGTH = 10000
 
-    def __init__(self, settings: AppSettings):
-        """Init AMQP Connexion class"""
+    def __init__(self, settings: AppSettings, state: State):
+        """
+        Init AMQP Connexion class
+
+        :param settings: AppSettings
+        :param state: fastapi app state
+
+        """
         self.settings = settings
+        self.app_state = state
+        self.app_state.amqp_disconnected = False
         self.pika_queue: aio_pika.Queue | None = None
         self.pika_channel: aio_pika.Channel | None = None
         self.pika_exchange: aio_pika.Exchange | None = None
@@ -25,6 +36,7 @@ class AMQPInterface:
         self.inner_tasks_queue: asyncio.Queue | None = None
         self.message_processing_workers: list[asyncio.Task] | None = None
         self.keys = [self.settings.amqp_retrieval_routing_key]
+        self.reconnect_event = asyncio.Event()
 
     async def connect(self):
         """Connect to AMQP queue"""
@@ -32,6 +44,14 @@ class AMQPInterface:
         await self._declare_exchange()
         await self._attach_message_processing_workers()
         await self._bind_queue()
+        asyncio.create_task(self._listen_for_reconnect())
+        await sleep(0)
+
+    async def _listen_for_reconnect(self):
+        """Listen for reconnect signals from worker tasks."""
+        await self.reconnect_event.wait()  # Wait until reconnect is triggered
+        logger.error("Reconnect signal received. Positioning flag in app state.")
+        self.app_state.amqp_disconnected = True
 
     async def listen(self):
         """Listen to AMQP queue"""
@@ -67,6 +87,7 @@ class AMQPInterface:
             exchange=self.pika_exchange,
             tasks_queue=self.inner_tasks_queue,
             settings=self.settings,
+            reconnect_event=self.reconnect_event,
         )
 
     async def _listen_to_messages(self):
