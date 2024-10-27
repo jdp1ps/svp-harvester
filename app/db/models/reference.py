@@ -115,14 +115,18 @@ class Reference(Base, VersionedRecord):
         )
     )
 
-    issue_id: Mapped[int] = mapped_column(ForeignKey("issues.id"), nullable=True)
+    issue_id: Mapped[int] = mapped_column(
+        ForeignKey("issues.id"), nullable=True, index=True
+    )
     issue: Mapped["app.db.models.issue.Issue"] = relationship(
         "app.db.models.issue.Issue",
         back_populates="references",
         lazy="noload",
     )
 
-    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"), nullable=True)
+    book_id: Mapped[int] = mapped_column(
+        ForeignKey("books.id"), nullable=True, index=True
+    )
     book: Mapped["app.db.models.book.Book"] = relationship(
         "app.db.models.book.Book",
         back_populates="references",
