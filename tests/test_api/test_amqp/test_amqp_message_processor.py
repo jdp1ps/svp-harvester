@@ -35,9 +35,9 @@ def fixture_mock_retrieval_service_run():
 
 
 @pytest.fixture(name="message_processor")
-async def fixture_message_processor() -> AMQPMessageProcessor:
+async def fixture_message_processor(test_app) -> AMQPMessageProcessor:
     """AMQP message processor fixture to use AMQPInterface as factory."""
-    amqp_connexion = AMQPInterface(get_app_settings())
+    amqp_connexion = AMQPInterface(get_app_settings(), state=test_app.state)
     # pylint: disable=protected-access
     return await amqp_connexion._message_processor()
 
