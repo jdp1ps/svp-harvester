@@ -6,7 +6,7 @@ from app.db.session import Base
 
 class OrganizationIdentifier(Base):
     """
-    Model for persistance of organization identifiers
+    Model for persistence of organization identifiers
     """
 
     __tablename__ = "organization_identifiers"
@@ -20,4 +20,6 @@ class OrganizationIdentifier(Base):
         back_populates="identifiers",
         lazy="raise",
     )
-    organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"))
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("organizations.id"), index=True
+    )
