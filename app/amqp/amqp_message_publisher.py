@@ -1,7 +1,7 @@
 import json
 
 import aio_pika
-from aio_pika import DeliveryMode, Message
+from aio_pika import DeliveryMode
 from aiormq import AMQPError, ChannelInvalidStateError
 from loguru import logger
 
@@ -27,7 +27,7 @@ class AMQPMessagePublisher:
         if routing_key is None:
             return
 
-        message = Message(
+        message = aio_pika.Message(
             json.dumps(payload, default=str).encode(),
             delivery_mode=DeliveryMode.PERSISTENT,
         )
@@ -44,8 +44,8 @@ class AMQPMessagePublisher:
             )
         except ChannelInvalidStateError as e:
             logger.error(
-                f"Channel state error occurred while publishing message to {routing_key} queue: {e}\n"
-                f"Payload: {payload}"
+                f"Channel state error occurred while publishing message to "
+                f"{routing_key} queue: {e}\nPayload: {payload}"
             )
 
     @staticmethod

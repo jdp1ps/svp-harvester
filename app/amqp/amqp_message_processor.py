@@ -1,5 +1,6 @@
 import asyncio
 import json
+import traceback
 from datetime import datetime
 
 import aio_pika
@@ -70,10 +71,11 @@ class AMQPMessageProcessor:
                     f"Connection refused during {worker_id} message processing : {connection_error}"
                 )
                 requeue = True
-            except Exception as exception:
+            except Exception as e:
                 logger.error(
-                    f"Unexpected exception during {worker_id} message processing : {exception}"
+                    f"Unexpected exception during {worker_id} message processing: {e}"
                 )
+                logger.error(traceback.format_exc())
             finally:
                 if message is not None and not message.processed:
                     await message.nack(requeue=requeue)
