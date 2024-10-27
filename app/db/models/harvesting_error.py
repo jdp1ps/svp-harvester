@@ -13,7 +13,7 @@ class HarvestingError(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    harvesting_id: Mapped[int] = mapped_column(ForeignKey("harvestings.id"))
+    harvesting_id: Mapped[int] = mapped_column(ForeignKey("harvestings.id"), index=True)
 
     name: Mapped[str] = mapped_column(nullable=False)
 

@@ -23,7 +23,7 @@ class Retrieval(Base):
         lazy="raise",
     )
 
-    entity_id: Mapped[int] = mapped_column(ForeignKey("entities.id"))
+    entity_id: Mapped[int] = mapped_column(ForeignKey("entities.id"), index=True)
     entity: Mapped["app.db.models.entity.Entity"] = relationship(
         "app.db.models.entity.Entity", back_populates="retrievals", lazy="joined"
     )

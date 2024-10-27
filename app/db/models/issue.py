@@ -32,7 +32,7 @@ class Issue(Base):
         lazy="raise",
     )
 
-    journal_id: Mapped[int] = mapped_column(ForeignKey("journals.id"))
+    journal_id: Mapped[int] = mapped_column(ForeignKey("journals.id"), index=True)
     journal: Mapped["app.db.models.journal.Journal"] = relationship(
         "app.db.models.journal.Journal",
         back_populates="issues",
