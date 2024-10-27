@@ -1,7 +1,8 @@
 import json
 
 import aio_pika
-from aio_pika import DeliveryMode
+from aio_pika import DeliveryMode, Message
+from aiormq import AMQPError, ChannelInvalidStateError
 from loguru import logger
 
 from app.amqp.amqp_harvesting_message_factory import AMQPHarvestingMessageFactory
@@ -21,19 +22,31 @@ class AMQPMessagePublisher:
         self.exchange = exchange
 
     async def publish(self, content: dict) -> None:
-        """Publish a message to the AMQP queue"""
+        """Publish a message to the AMQP queue."""
         payload, routing_key = await self._build_message(content)
         if routing_key is None:
             return
-        message = aio_pika.Message(
+
+        message = Message(
             json.dumps(payload, default=str).encode(),
             delivery_mode=DeliveryMode.PERSISTENT,
         )
-        await self.exchange.publish(
-            message=message,
-            routing_key=routing_key,
-        )
-        logger.debug(f"Message published to {routing_key} queue : {payload}")
+        try:
+            await self.exchange.publish(
+                message=message,
+                routing_key=routing_key,
+            )
+            logger.debug(f"Message published to {routing_key} queue : {payload}")
+        except AMQPError as e:
+            logger.error(
+                f"AMQP error occurred while publishing message to {routing_key} queue: {e}\n"
+                f"Payload: {payload}"
+            )
+        except ChannelInvalidStateError as e:
+            logger.error(
+                f"Channel state error occurred while publishing message to {routing_key} queue: {e}\n"
+                f"Payload: {payload}"
+            )
 
     @staticmethod
     async def _build_message(content) -> tuple[str | None, str | None]:
