@@ -2,6 +2,7 @@ import asyncio
 import json
 import traceback
 from datetime import datetime
+from random import randint
 
 import aio_pika
 from aio_pika import IncomingMessage
@@ -32,10 +33,12 @@ class AMQPMessageProcessor:
         exchange: aio_pika.Exchange,
         tasks_queue: asyncio.Queue,
         settings: AppSettings,
+        reconnect_event: asyncio.Event,
     ):
         self.exchange = exchange
         self.tasks_queue = tasks_queue
         self.settings = settings
+        self.reconnect_event = reconnect_event
         self._init_publisher()
 
     def _init_publisher(self) -> None:
@@ -54,17 +57,28 @@ class AMQPMessageProcessor:
             start_time = None
             try:
                 message = await self.tasks_queue.get()
+                # if random number 1-2 is superior to 1, raise an exception
+                number = randint(1, 2)
+                if number > 1:
+                    self.reconnect_event.set()
                 start_time = datetime.now()
                 async with message.process(ignore_processed=True):
                     payload = message.body
                     await self._process_message(payload)
                     await message.ack()
                     self.tasks_queue.task_done()
-            except (AMQPError, ChannelInvalidStateError) as ack_error:
+            except ChannelInvalidStateError as channel_error:
                 logger.error(
                     f"Channel invalid state error during {worker_id} "
-                    f"message ack: {ack_error}"
+                    f"message ack: {channel_error}"
                 )
+                self.reconnect_event.set()
+                return
+            except AMQPError as ack_error:
+                logger.error(
+                    f"AMQP error occurred during {worker_id} message ack: {ack_error}"
+                )
+                self.reconnect_event.set()
             except KeyboardInterrupt as keyboard_interrupt:
                 logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
                 await message.nack(requeue=True)
@@ -86,10 +100,16 @@ class AMQPMessageProcessor:
                 if message is not None and not message.processed:
                     try:
                         await message.nack(requeue=requeue)
-                    except (AMQPError, ChannelInvalidStateError) as nack_error:
+                    except ChannelInvalidStateError as channel_error:
                         logger.error(
-                            f"Error during message nack for {worker_id} : {nack_error}"
+                            f"Error during message nack for {worker_id} : {channel_error}"
                         )
+                        self.reconnect_event.set()
+                    except AMQPError as nack_error:
+                        logger.error(
+                            f"AMQP error during message nack for {worker_id} : {nack_error}"
+                        )
+                        self.reconnect_event.set()
                     self.tasks_queue.task_done()
                 end_time = datetime.now()
                 logger.warning(

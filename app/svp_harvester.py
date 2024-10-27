@@ -118,7 +118,7 @@ class SvpHarvester(FastAPI):
         """Init AMQP connexion at boot time"""
         try:
             logger.info("Enabling RabbitMQ connexion")
-            self.amqp_interface = AMQPInterface(get_app_settings())
+            self.amqp_interface = AMQPInterface(get_app_settings(), self.state)
             await self.amqp_interface.connect()
             asyncio.create_task(self.amqp_interface.listen(), name="amqp_listener")
             logger.info("RabbitMQ connexion has been enabled")
