@@ -193,14 +193,16 @@ class Contribution(Base):
 
     rank: Mapped[int] = mapped_column(nullable=True)
 
-    contributor_id: Mapped[int] = mapped_column(ForeignKey("contributors.id"))
+    contributor_id: Mapped[int] = mapped_column(
+        ForeignKey("contributors.id"), index=True
+    )
     contributor: Mapped["app.db.models.contributor.Contributor"] = relationship(
         "app.db.models.contributor.Contributor",
         lazy="joined",
         cascade="all",
     )
 
-    reference_id: Mapped[int] = mapped_column(ForeignKey("references.id"))
+    reference_id: Mapped[int] = mapped_column(ForeignKey("references.id"), index=True)
     reference: Mapped["app.db.models.reference.Reference"] = relationship(
         "app.db.models.reference.Reference",
         back_populates="contributions",
@@ -211,12 +213,12 @@ class Contribution(Base):
         nullable=False, index=True, default=lambda: Contribution.get_url("UNKNOWN")
     )
 
-    affiliations: Mapped[
-        List["app.db.models.organization.Organization"]
-    ] = relationship(
-        "app.db.models.organization.Organization",
-        secondary=affiliations_table,
-        lazy="joined",
+    affiliations: Mapped[List["app.db.models.organization.Organization"]] = (
+        relationship(
+            "app.db.models.organization.Organization",
+            secondary=affiliations_table,
+            lazy="joined",
+        )
     )
 
     @validates("role")
