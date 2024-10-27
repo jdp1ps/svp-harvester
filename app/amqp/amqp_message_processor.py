@@ -2,7 +2,6 @@ import asyncio
 import json
 import traceback
 from datetime import datetime
-from random import randint
 
 import aio_pika
 from aio_pika import IncomingMessage
@@ -57,10 +56,6 @@ class AMQPMessageProcessor:
             start_time = None
             try:
                 message = await self.tasks_queue.get()
-                # if random number 1-2 is superior to 1, raise an exception
-                number = randint(1, 2)
-                if number > 1:
-                    self.reconnect_event.set()
                 start_time = datetime.now()
                 async with message.process(ignore_processed=True):
                     payload = message.body
