@@ -1,3 +1,4 @@
+import traceback
 from abc import ABC, abstractmethod
 from asyncio import Queue
 from typing import Optional, AsyncGenerator, Type, List
@@ -209,8 +210,10 @@ class AbstractHarvester(ABC):  # pylint: disable=too-many-instance-attributes
             await self.handle_error(connection_error)
         # this is for debugging purpose only
         # as no other exception types are expected during normal execution
-        # except Exception as error:
-        #     raise error
+        except Exception as e:
+            logger.error(f"Unexpected exception during harvester run : {e}")
+            logger.error(traceback.format_exc())
+            await self.handle_error(e)
 
     async def _handle_converted_result(
         self,
