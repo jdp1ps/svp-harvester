@@ -15,11 +15,12 @@ class Identifier(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(nullable=False, index=True)
     value: Mapped[str] = mapped_column(nullable=False, index=True)
-    entity_id: Mapped[int] = mapped_column(ForeignKey("entities.id"))
+    entity_id: Mapped[int] = mapped_column(ForeignKey("entities.id"), index=True)
     entity: Mapped["app.db.models.entity.Entity"] = relationship(
-        "app.db.models.entity.Entity", back_populates="identifiers", lazy="raise")
+        "app.db.models.entity.Entity", back_populates="identifiers", lazy="raise"
+    )
 
-    __table_args__ = (UniqueConstraint('type', 'value'),)
+    __table_args__ = (UniqueConstraint("type", "value"),)
 
     @validates("type", include_removes=False, include_backrefs=True)
     def _valide_identifier_is_referenced_by_settings(self, _, new_type):
