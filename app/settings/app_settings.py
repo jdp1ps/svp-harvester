@@ -49,12 +49,13 @@ class AppSettings(BaseSettings):
     amqp_user: str = "guest"
     amqp_password: str = "guest"
     amqp_host: str = "127.0.0.1"
+    amqp_exchange_name: str = "publications"
     amqp_queue_name: str = "svp-harvester"
     amqp_wait_before_shutdown: int = 30
-    amqp_task_parallelism_limit: int = 5
-    amqp_exchange_name: str = "publications"
-    amqp_prefetch_count: int = 5
-    amqp_consumer_ack_timeout: int = 180000
+    inner_task_parallelism_limit: int = 5
+    inner_task_queue_length: int = 5
+    amqp_prefetch_count: int = 1
+    amqp_consumer_ack_timeout: int = 3000
     amqp_retrieval_routing_key: str = "task.entity.references.retrieval"
     amqp_reference_event_routing_key: str = "event.references.reference.*"
     amqp_harvesting_event_routing_key: str = "event.references.harvesting.state"

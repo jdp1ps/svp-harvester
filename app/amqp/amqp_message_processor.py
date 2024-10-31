@@ -28,11 +28,11 @@ class AMQPMessageProcessor:
     MAX_EXPECTED_RESULTS = 10000
 
     def __init__(
-        self,
-        exchange: aio_pika.Exchange,
-        tasks_queue: asyncio.Queue,
-        settings: AppSettings,
-        reconnect_event: asyncio.Event,
+            self,
+            exchange: aio_pika.Exchange,
+            tasks_queue: asyncio.Queue,
+            settings: AppSettings,
+            reconnect_event: asyncio.Event,
     ):
         self.exchange = exchange
         self.tasks_queue = tasks_queue
@@ -56,12 +56,20 @@ class AMQPMessageProcessor:
             start_time = None
             try:
                 message = await self.tasks_queue.get()
+                message_id = message.message_id
                 start_time = datetime.now()
+                payload: bytes = message.body
                 async with message.process(ignore_processed=True):
                     payload = message.body
-                    await self._process_message(payload)
-                    await message.ack()
-                    self.tasks_queue.task_done()
+                    ack_time = datetime.now()
+                    logger.debug(
+                        f"Message {message_id}  acked by {worker_id} in {ack_time - start_time}"
+                    )
+                await self._process_message(payload)
+                self.tasks_queue.task_done()
+                logger.debug(
+                    f"Message {message_id}  processed by {worker_id} in {datetime.now() - ack_time}"
+                )
             except ChannelInvalidStateError as channel_error:
                 logger.error(
                     f"Channel invalid state error during {worker_id} "
@@ -76,7 +84,8 @@ class AMQPMessageProcessor:
                 self.reconnect_event.set()
             except KeyboardInterrupt as keyboard_interrupt:
                 logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
-                await message.nack(requeue=True)
+                if message is not None and not message.processed:
+                    await message.nack(requeue=True)
                 raise keyboard_interrupt
             except InvalidEntityError as invalid_entity_error:
                 logger.error(f"Invalid entity submitted : {invalid_entity_error}")
@@ -125,7 +134,7 @@ class AMQPMessageProcessor:
                         "type": "Retrieval",
                         "error": True,
                         "message": f"Entity validation error,"
-                        f" retrieval aborted: {validation_error}",
+                                   f" retrieval aborted: {validation_error}",
                         "parameters": json_payload,
                     }
                 )
@@ -191,7 +200,7 @@ class AMQPMessageProcessor:
                 listen.cancel()
 
     async def _wait_for_retrieval_result(
-        self, result_queue: asyncio.Queue, retrieval: Retrieval, timeout: int
+            self, result_queue: asyncio.Queue, retrieval: Retrieval, timeout: int
     ):
         try:
             while True:

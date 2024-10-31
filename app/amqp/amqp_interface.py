@@ -16,8 +16,6 @@ DEFAULT_RESULT_TIMEOUT = 600
 class AMQPInterface:
     """Rabbitmq Connexion abstraction"""
 
-    INNER_TASKS_QUEUE_LENGTH = 10000
-
     def __init__(self, settings: AppSettings, state: State):
         """
         Init AMQP Connexion class
@@ -72,8 +70,8 @@ class AMQPInterface:
 
     async def _attach_message_processing_workers(self):
         self.message_processing_workers = []
-        self.inner_tasks_queue = asyncio.Queue(maxsize=self.INNER_TASKS_QUEUE_LENGTH)
-        for worker_id in range(self.settings.amqp_task_parallelism_limit):
+        self.inner_tasks_queue = asyncio.Queue(maxsize=self.settings.inner_task_queue_length)
+        for worker_id in range(self.settings.inner_task_parallelism_limit):
             processor = await self._message_processor()
             self.message_processing_workers.append(
                 asyncio.create_task(
@@ -91,9 +89,32 @@ class AMQPInterface:
         )
 
     async def _listen_to_messages(self):
-        async with self.pika_queue.iterator() as queue_iter:
-            async for message in queue_iter:
-                await self.inner_tasks_queue.put(message)
+        while True:
+            if self.inner_tasks_queue.full():
+                logger.debug(
+                    f"Queue is full with {self.inner_tasks_queue.qsize()} messages, "
+                    f"pausing message consumption."
+                )
+                await asyncio.sleep(0.1)
+                continue
+            if self.app_state.amqp_disconnected:
+                logger.warning("AMQP disconnected. Pausing message consumption.")
+                await asyncio.sleep(0.1)
+                continue
+            try:
+                message = await self.pika_queue.get(no_ack=True, fail=False)
+            except TimeoutError:
+                logger.error("Timeout error while getting message from queue")
+                continue
+            if message is None:
+                await asyncio.sleep(0.5)
+                logger.warning("No message received, go on listening")
+                continue
+            message_id = message.message_id
+            logger.info(f"Accepted new message : {message_id}")
+            await self.inner_tasks_queue.put(message)
+            logger.debug(f"Current size of inner tasks queue after adding message:"
+                         f" {self.inner_tasks_queue.qsize()}")
 
     async def _declare_exchange(self) -> None:
         """
