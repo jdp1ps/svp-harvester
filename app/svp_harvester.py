@@ -16,6 +16,7 @@ from app.config import get_app_settings
 from app.db.session import async_session
 from app.gui.routes.gui import router as gui_router
 from app.redis.redis_pool import RedisPool
+from app.settings.app_env_types import AppEnvTypes
 
 
 class SvpHarvester(FastAPI):
@@ -27,7 +28,10 @@ class SvpHarvester(FastAPI):
 
     def __init__(self):
         super().__init__()
-
+        # only if app_env == "dev"
+        if get_app_settings().app_env == AppEnvTypes.DEV:
+            import asyncio
+            asyncio.get_event_loop().set_debug(True)
         self.amqp_interface: AMQPInterface | None = None
 
         settings = get_app_settings()

@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import aio_pika
@@ -23,7 +24,9 @@ class AMQPMessagePublisher:
 
     async def publish(self, content: dict) -> None:
         """Publish a message to the AMQP queue."""
-        payload, routing_key = await self._build_message(content)
+        task = asyncio.create_task(self._build_message(content))
+        await asyncio.sleep(0)
+        payload, routing_key = await task
         if routing_key is None:
             return
 
@@ -50,10 +53,21 @@ class AMQPMessagePublisher:
 
     @staticmethod
     async def _build_message(content) -> tuple[str | None, str | None]:
+        task = None
         if content.get("type") == "Retrieval":
-            return await AMQPRetrievalMessageFactory(content).build_message()
-        if content.get("type") == "Harvesting":
-            return await AMQPHarvestingMessageFactory(content).build_message()
-        if content.get("type") == "ReferenceEvent":
-            return await AMQPReferenceEventMessageFactory(content).build_message()
+            task = asyncio.create_task(
+                AMQPRetrievalMessageFactory(content).build_message()
+            )
+        elif content.get("type") == "Harvesting":
+            task = asyncio.create_task(
+                AMQPHarvestingMessageFactory(content).build_message()
+            )
+        elif content.get("type") == "ReferenceEvent":
+            # return await AMQPReferenceEventMessageFactory(content).build_message()
+            task = asyncio.create_task(
+                AMQPReferenceEventMessageFactory(content).build_message()
+            )
+        if task:
+            await asyncio.sleep(0)
+            return await task
         return None, None
