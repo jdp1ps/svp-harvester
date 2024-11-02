@@ -70,7 +70,9 @@ class AMQPInterface:
 
     async def _attach_message_processing_workers(self):
         self.message_processing_workers = []
-        self.inner_tasks_queue = asyncio.Queue(maxsize=self.settings.inner_task_queue_length)
+        self.inner_tasks_queue = asyncio.Queue(
+            maxsize=self.settings.inner_task_queue_length
+        )
         for worker_id in range(self.settings.inner_task_parallelism_limit):
             processor = await self._message_processor()
             self.message_processing_workers.append(
@@ -111,10 +113,16 @@ class AMQPInterface:
                 logger.warning("No message received, go on listening")
                 continue
             message_id = message.message_id
-            logger.info(f"Accepted new message : {message_id}")
+            message_addr = hex(id(message))
+            delivery_tag = message.delivery_tag
+            logger.info(
+                f"Accepted new message : {message_id or message_addr} / tag {delivery_tag}"
+            )
             await self.inner_tasks_queue.put(message)
-            logger.debug(f"Current size of inner tasks queue after adding message:"
-                         f" {self.inner_tasks_queue.qsize()}")
+            logger.debug(
+                f"Current size of inner tasks queue after adding message:"
+                f" {self.inner_tasks_queue.qsize()}"
+            )
 
     async def _declare_exchange(self) -> None:
         """

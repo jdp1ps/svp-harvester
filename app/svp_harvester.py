@@ -1,5 +1,6 @@
 import asyncio
 import sys
+import time
 
 from aiormq import AMQPConnectionError
 from fastapi import FastAPI
@@ -28,12 +29,15 @@ class SvpHarvester(FastAPI):
 
     def __init__(self):
         super().__init__()
-        if get_app_settings().app_env == AppEnvTypes.DEV:
-            import asyncio # pylint: disable=import-outside-toplevel
-            asyncio.get_event_loop().set_debug(True)
-        self.amqp_interface: AMQPInterface | None = None
-
         settings = get_app_settings()
+        # Set asyncio event loop to debug mode in DEV environment
+        if settings.app_env == AppEnvTypes.DEV and settings.monitor_loop_lag:
+            import asyncio  # pylint: disable=import-outside-toplevel
+
+            asyncio.get_event_loop().set_debug(True)
+            self.add_event_handler("startup", self._set_monitor_loop)
+
+        self.amqp_interface: AMQPInterface | None = None
 
         self.include_router(
             api_router, prefix=f"{settings.api_prefix}/{settings.api_version}"
@@ -71,6 +75,19 @@ class SvpHarvester(FastAPI):
         if settings.amqp_enabled:
             self.add_event_handler("startup", self.open_rabbitmq_connexion)
             self.add_event_handler("shutdown", self.close_rabbitmq_connexion)
+
+    async def _set_monitor_loop(self):
+        asyncio.create_task(self.monitor_loop_lag(), name="monitor_loop_lag")
+        await asyncio.sleep(0)
+
+    async def monitor_loop_lag(self):
+        loop_lag_threshold = get_app_settings().loop_lag_threshold
+        while True:
+            start = time.time()
+            await asyncio.sleep(1)
+            lag = time.time() - start - 1
+            if lag > loop_lag_threshold:
+                logger.warning(f"High event loop lag detected: {lag:.2f} seconds")
 
     @logger.catch(reraise=True)
     async def check_db_connexion(self) -> None:
