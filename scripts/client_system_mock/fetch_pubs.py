@@ -46,6 +46,7 @@ def _publish_requests(args):
     channel.exchange_declare(
         exchange_name,
         ExchangeType.topic,
+        durable=True,
     )
 
     count = 0
