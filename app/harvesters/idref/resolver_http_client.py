@@ -1,3 +1,5 @@
+from asyncio.exceptions import TimeoutError as AsyncTimeoutError
+
 import aiohttp
 
 from app.harvesters.exceptions.external_endpoint_failure import ExternalEndpointFailure
@@ -34,6 +36,10 @@ class ResolverHTTPClient:
         except aiohttp.ClientConnectorError as error:
             raise ExternalEndpointFailure(
                 f"Cant resolve URI : {document_url} with error {error}"
+            ) from error
+        except AsyncTimeoutError as error:
+            raise ExternalEndpointFailure(
+                f"Timeout while resolving URI : {document_url}"
             ) from error
         except Exception as error:
             raise ExternalEndpointFailure(
