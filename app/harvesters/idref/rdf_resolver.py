@@ -8,6 +8,7 @@ from app.harvesters.exceptions.unexpected_format_exception import (
     UnexpectedFormatException,
 )
 from app.harvesters.idref.resolver_http_client import ResolverHTTPClient
+from app.utilities.async_rdf_graph_decorator import AsyncRDFGraphDecorator
 
 DEFAULT_RDF_TIMEOUT = 30
 
@@ -32,7 +33,9 @@ class RdfResolver:
             cleaned_response_text = self._clean_response_text(response_text)
 
             try:
-                graph = Graph().parse(data=cleaned_response_text, format=output_format)
+                graph = await AsyncRDFGraphDecorator().parse(
+                    data=cleaned_response_text, rdf_format=output_format
+                )
                 return graph
             except (ParserError, SAXParseException) as error:
                 raise UnexpectedFormatException(

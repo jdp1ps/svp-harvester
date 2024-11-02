@@ -2,17 +2,19 @@ import asyncio
 import re
 from typing import List
 from typing import Tuple
-from rdflib import OWL, Graph, term
 
 import aiohttp
-from app.services.organizations.organization_data_class import OrganizationInformations
-from app.services.organizations import (  # pylint: disable=cyclic-import
-    organization_factory,
-)
+from rdflib import OWL, term
+
 from app.db.models.organization import Organization
 from app.db.models.organization_identifier import OrganizationIdentifier
 from app.services.concepts.dereferencing_error import DereferencingError
+from app.services.organizations import (  # pylint: disable=cyclic-import
+    organization_factory,
+)
+from app.services.organizations.organization_data_class import OrganizationInformations
 from app.services.organizations.organization_solver import OrganizationSolver
+from app.utilities.async_rdf_graph_decorator import AsyncRDFGraphDecorator
 
 
 # pylint: disable=duplicate-code
@@ -67,7 +69,9 @@ class IdrefOrganizationSolver(OrganizationSolver):
                             f" while dereferencing {idref_url}"
                         )
                     xml = await response.text()
-                    concept_graph = Graph().parse(data=xml, format="xml")
+                    concept_graph = await AsyncRDFGraphDecorator().parse(
+                        data=xml, rdf_format="xml"
+                    )
                     # Search for sameAs identifiers
                     for uri in concept_graph.objects(
                         term.URIRef(idref_uri), OWL.sameAs

@@ -11,6 +11,7 @@ from app.db.models.concept import Concept as DbConcept
 from app.services.concepts.concept_informations import ConceptInformations
 from app.services.concepts.concept_solver import ConceptSolver
 from app.services.concepts.dereferencing_error import DereferencingError
+from app.utilities.async_rdf_graph_decorator import AsyncRDFGraphDecorator
 
 
 class RdfConceptSolver(ConceptSolver, ABC):
@@ -37,7 +38,9 @@ class RdfConceptSolver(ConceptSolver, ABC):
                             f" at url {concept_informations.url}"
                         )
                     xml = (await response.text()).strip()
-                    concept_graph = Graph().parse(data=xml, format="xml")
+                    concept_graph = await AsyncRDFGraphDecorator().parse(
+                        data=xml, rdf_format="xml"
+                    )
                     concept = DbConcept(uri=concept_informations.uri)
 
                     self._add_labels(
