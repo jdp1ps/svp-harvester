@@ -76,10 +76,13 @@ class IdrefHarvester(AbstractHarvester):
             assert (
                 idref is not None or orcid is not None
             ), "Idref or Orcid identifier required when harvesting publications from data.idref.fr"
-            if idref is not None:
+            if idref is not None and re.fullmatch(r"\d{8}[\dX]|", idref):
                 builder.set_subject_type(QueryBuilder.SubjectType.PERSON).set_idref_id(
                     idref
                 )
+            else:
+                logger.warning(f"Unexpected idref format detected: '{idref}', for entity type "
+                               f"{self.entity.type} named {self.entity.name}")
             if orcid is not None:
                 builder.set_subject_type(QueryBuilder.SubjectType.PERSON).set_orcid(
                     orcid

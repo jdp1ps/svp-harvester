@@ -11,6 +11,7 @@ from starlette.testclient import TestClient
 from loguru import logger
 from app.db.models.concept import Concept as DbConcept
 from app.db.session import engine, Base
+from app.harvesters.abstract_harvester import AbstractHarvester
 from app.services.concepts.abes_concept_solver import AbesConceptSolver
 from app.services.concepts.concept_informations import ConceptInformations
 from app.services.concepts.dereferencing_error import DereferencingError
@@ -257,3 +258,11 @@ def caplog(caplog: LogCaptureFixture):  # pylint: disable=redefined-outer-name
         logger.remove(handler_id)
     except ValueError:
         pass
+
+
+
+@pytest.fixture(name="mock_handle_error")
+def fixture_mock_handle_error():
+    """Hal harvester mock to detect is_relevant method calls."""
+    with mock.patch.object(AbstractHarvester, "handle_error") as mock_handle_error:
+        yield mock_handle_error

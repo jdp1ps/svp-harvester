@@ -1,0 +1,9 @@
+{
+  "name": "John Doe",
+  "identifiers": [
+    {
+      "type": "idref",
+      "value": "12345678"
+    }
+  ]
+}

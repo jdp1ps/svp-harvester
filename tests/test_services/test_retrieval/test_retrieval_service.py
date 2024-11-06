@@ -1,5 +1,6 @@
 """Test the references API."""
 from unittest import mock
+
 from fastapi import HTTPException
 import pytest
 
@@ -125,3 +126,53 @@ async def test_retrieval_service_registers_identifiers_matches_nullify(
         exc_info.value.detail
         == "Unprocessable Entity: id_hal_s cannot be declared and nullified at same time"
     )
+
+
+
+@pytest.mark.asyncio
+async def test_retrieval_service_idref_with_invalid_idref_format(
+        person_with_name_and_invalid_idref: Person,
+        caplog,
+        mock_handle_error,
+):
+    """
+    GIVEN a retrieval service to which a person with an invalid idref has been submitted
+    WHEN running the RetrievalService
+    THEN a warning should be logged and handle_error should be called
+    :param person_with_name_and_invalid_idref:
+    :return:
+    """
+
+    service = RetrievalService(harvesters=["idref"])
+    await service.register(person_with_name_and_invalid_idref)
+    retrieval: Retrieval = await service.register(person_with_name_and_invalid_idref)
+    await service.run()
+    assert "Unexpected idref format detected" in caplog.text
+    assert mock_handle_error.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_retrieval_service_idref_with_invalid_idref_and_valid_orcid_format(
+        person_with_name_and_invalid_idref: Person,
+        caplog,
+        mock_handle_error,
+):
+    """
+    GIVEN a retrieval service to which a person with an invalid idref has been submitted
+    WHEN running the RetrievalService
+    THEN a warning should be logged but handle_error should not be called
+    :param person_with_name_and_invalid_idref:
+    :return:
+    """
+
+    orcid_identifier = Identifier(
+        type="orcid",
+        value="0000-0002-1825-0097",
+    )
+    person_with_name_and_invalid_idref.identifiers.append(orcid_identifier)
+    service = RetrievalService(harvesters=["idref"])
+    await service.register(person_with_name_and_invalid_idref)
+    retrieval: Retrieval = await service.register(person_with_name_and_invalid_idref)
+    await service.run()
+    assert "Unexpected idref format detected" in caplog.text
+    assert mock_handle_error.call_count == 0

@@ -140,3 +140,24 @@ def fixture_person_with_name_and_scopus_eid_json(_base_path) -> dict:
     :return: person with first name, last name and EID in Json format
     """
     return _person_json_data_from_file(_base_path, "person_with_name_and_scopus_eid")
+
+
+@pytest.fixture(name="person_with_name_and_invalid_idref")
+def fixture_person_with_name_and_invalid_idref(
+    person_with_name_and_invalid_idref_json,
+) -> PydanticPerson:
+    """
+    Generate a person with first name, last name and IDREF in Pydantic format
+    :return: person with first name, last name and IDREF  in Pydantic format
+    """
+    return _person_from_json_data(person_with_name_and_invalid_idref_json)
+
+
+@pytest.fixture(name="person_with_name_and_invalid_idref_json")
+def fixture_person_with_name_and_invalid_idref_json(_base_path) -> dict:
+    """
+    Generate a person with first name, last name and IDREF in Json format
+    :param _base_path: test data directory base
+    :return: person with first name, last name and IDREF in Json format
+    """
+    return _person_json_data_from_file(_base_path, "person_with_name_and_invalid_idref")
