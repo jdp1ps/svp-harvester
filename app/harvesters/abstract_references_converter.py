@@ -38,6 +38,7 @@ from app.services.journal.journal_data_class import JournalInformations
 from app.services.organizations.merge_organization import merge_organization
 from app.services.organizations.organization_data_class import OrganizationInformations
 from app.services.organizations.organization_factory import OrganizationFactory
+from app.utilities.execution_timer_wrapper import execution_timer
 
 
 class AbstractReferencesConverter(ABC):
@@ -314,6 +315,7 @@ class AbstractReferencesConverter(ABC):
                         )
         return concept
 
+    @execution_timer
     async def _get_or_create_concept_by_uri(
         self,
         concept_informations: ConceptInformations,

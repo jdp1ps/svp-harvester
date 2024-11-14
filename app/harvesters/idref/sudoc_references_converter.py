@@ -31,6 +31,7 @@ from app.services.hash.hash_key import HashKey
 from app.services.issue.issue_data_class import IssueInformations
 from app.services.journal.journal_data_class import JournalInformations
 from app.utilities.date_utilities import check_valid_iso8601_date
+from app.utilities.execution_timer_wrapper import execution_timer
 from app.utilities.isbn_utilities import get_isbns
 from app.utilities.string_utilities import normalize_string, remove_after_separator
 
@@ -73,6 +74,7 @@ class SudocReferencesConverter(AbesRDFReferencesConverter):
                 )
                 new_ref.issue = issue
 
+    @execution_timer
     async def _get_subjects(self, pub_graph, uri, new_ref):
         for subject in pub_graph.objects(rdflib.term.URIRef(uri), DCTERMS.subject):
             concept_uri = str(subject)
