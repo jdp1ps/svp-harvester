@@ -137,6 +137,7 @@ class IdrefSparqlQueryBuilder:
 
         PERSON = "person"
         PUBLICATION = "publication"
+        CONCEPT = "concept"
 
     class Marcrel(Namespace):
         """
@@ -173,7 +174,7 @@ class IdrefSparqlQueryBuilder:
 
     def set_subject_type(self, subject_type: SubjectType):
         """
-        Set the type of subject about which data will be retrieved : person or publication
+        Set the type of subject about which data will be retrieved : person, publication or concept
         :param subject_type: the type of subject
         :return: the query builder
         """
@@ -206,6 +207,8 @@ class IdrefSparqlQueryBuilder:
             return self._build_person_query()
         if self.subject_type == IdrefSparqlQueryBuilder.SubjectType.PUBLICATION:
             return self._build_publication_query()
+        if self.subject_type == IdrefSparqlQueryBuilder.SubjectType.CONCEPT:
+            return self._build_concept_query()
         raise ValueError(f"Unknown subject type {self.subject_type}")
 
     def _build_person_query(self) -> str:
@@ -268,6 +271,18 @@ class IdrefSparqlQueryBuilder:
             "select distinct ?prop ?val "  # caution: trailing space is important
             f"where {{<{self.subject_uri}> ?prop ?val}}\n"
             "LIMIT 10000"
+        )
+
+    def _build_concept_query(self) -> str:
+        return (
+            "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
+            "select distinct ?prefLabel ?altLabel "
+            "where { "
+            f"<{self.subject_uri}> a skos:Concept. "
+            f"OPTIONAL {{<{self.subject_uri}> skos:prefLabel ?prefLabel}}. "
+            f"OPTIONAL {{<{self.subject_uri}> skos:altLabel ?altLabel}} "
+            "} "
+            "LIMIT 100"
         )
 
     def _person_sparql_filter(self):

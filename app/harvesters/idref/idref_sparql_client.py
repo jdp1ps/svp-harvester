@@ -165,6 +165,40 @@ class IdrefSparqlClient:
         finally:
             await client.close()
 
+    async def fetch_concept(self, query: str) -> dict:
+        """
+        Fetch data for a single concept from the Idref sparql endpoint
+        :param query: the sparql query to send to the Idref sparql endpoint
+        :return: the result as dict
+        """
+        client: SPARQLClient = self._get_client()
+
+        try:
+            response = await client.query(query)
+            concept_raw_data: dict = response.get("results", {}).get("bindings", [])
+            has_preflabel = any('prefLabel' in entry for entry in concept_raw_data)
+            has_altlabel = any('altLabel' in entry for entry in concept_raw_data)
+            dict_to_return = {}
+
+            if has_preflabel:
+                pref_labels_list = [entry.get("prefLabel") for entry in concept_raw_data]
+                unique_pref_labels = {tuple(label.items()) for label in pref_labels_list}
+                dict_to_return["pref_labels"] = [dict(label) for label in unique_pref_labels]
+
+            if has_altlabel:
+                alt_labels_list = [entry.get("altLabel") for entry in concept_raw_data]
+                unique_alt_labels = {tuple(label.items()) for label in alt_labels_list}
+                dict_to_return["alt_labels"]  = [dict(label) for label in unique_alt_labels]
+
+            return dict_to_return
+        except Exception as error:
+            raise ExternalEndpointFailure(
+                "Error while fetching Idref sparql endpoint for query : "
+                f"{query} with error {error.__class__.__name__} {error if error else ''}"
+            ) from error
+        finally:
+            await client.close()
+
     def _result_source_code(self, uri: str) -> str:
         for source, prefixes in self.DATA_SOURCES_PREFIXES.items():
             if any(uri.startswith(prefix) for prefix in prefixes):
