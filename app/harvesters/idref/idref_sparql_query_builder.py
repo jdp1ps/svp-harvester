@@ -278,9 +278,10 @@ class IdrefSparqlQueryBuilder:
             "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
             "select distinct ?prefLabel ?altLabel "
             "where { "
-            f"<{self.subject_uri}> a skos:Concept. "
-            f"OPTIONAL {{<{self.subject_uri}> skos:prefLabel ?prefLabel}}. "
-            f"OPTIONAL {{<{self.subject_uri}> skos:altLabel ?altLabel}} "
+            "?concept a skos:Concept. "
+            "OPTIONAL { ?concept skos:prefLabel ?prefLabel }. "
+            "OPTIONAL { ?concept skos:altLabel ?altLabel }. "
+            f"FILTER(?concept = <{self.subject_uri}>) "
             "} "
             "LIMIT 100"
         )

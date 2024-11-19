@@ -38,7 +38,7 @@ class IdRefConceptSolver(ConceptSolver):
                     f"Unable to extract code from uri {concept_informations.uri}"
                 )
         assert (
-                concept_informations.code is not None
+            concept_informations.code is not None
         ), "Concept information may not be None at this point"
         if not concept_informations.code[0:-1].isdigit():
             raise DereferencingError(
@@ -80,6 +80,7 @@ class IdRefConceptSolver(ConceptSolver):
                 ),
                 True,
             )
+
         if 'alt_labels' in returned_concept:
             self._add_labels(
                 concept,

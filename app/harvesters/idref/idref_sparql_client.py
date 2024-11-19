@@ -139,6 +139,7 @@ class IdrefSparqlClient:
         finally:
             await client.close()
 
+    @execution_timer
     async def fetch_publication(self, query: str) -> dict:
         """
         Fetch data for a single publication from the Idref sparql endpoint
@@ -176,18 +177,20 @@ class IdrefSparqlClient:
         try:
             response = await client.query(query)
             concept_raw_data: dict = response.get("results", {}).get("bindings", [])
-            has_preflabel = any('prefLabel' in entry for entry in concept_raw_data)
-            has_altlabel = any('altLabel' in entry for entry in concept_raw_data)
             dict_to_return = {}
 
-            if has_preflabel:
-                pref_labels_list = [entry.get("prefLabel") for entry in concept_raw_data]
-                unique_pref_labels = {tuple(label.items()) for label in pref_labels_list}
+            if any('prefLabel' in entry for entry in concept_raw_data):
+                unique_pref_labels = {
+                    tuple(label.items()) for label in
+                    (entry.get("prefLabel") for entry in concept_raw_data)
+                }
                 dict_to_return["pref_labels"] = [dict(label) for label in unique_pref_labels]
 
-            if has_altlabel:
-                alt_labels_list = [entry.get("altLabel") for entry in concept_raw_data]
-                unique_alt_labels = {tuple(label.items()) for label in alt_labels_list}
+            if any('altLabel' in entry for entry in concept_raw_data):
+                unique_alt_labels = {
+                    tuple(label.items()) for label in
+                    (entry.get("altLabel") for entry in concept_raw_data)
+                }
                 dict_to_return["alt_labels"]  = [dict(label) for label in unique_alt_labels]
 
             return dict_to_return

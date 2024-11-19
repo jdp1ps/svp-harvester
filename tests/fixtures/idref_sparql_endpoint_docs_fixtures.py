@@ -95,6 +95,47 @@ def fixture_idref_sparql_endpoint_results_with_sudoc_cached_pub(_base_path) -> d
     )
 
 
+@pytest.fixture(name="idref_sparql_endpoint_response_for_concept")
+def fixture_idref_sparql_endpoint_response_for_concept(_base_path) -> dict:
+    """
+    Generate an Idref Sparql endpoint concept response
+
+    :param _base_path: test data directory base
+    :return: Idref Sparql endpoint response
+    """
+    return _idref_sparql_endpoint_json_results_from_file(
+        _base_path, "idref_sparql_endpoint_response_for_concept"
+    )
+
+
+@pytest.fixture(name="idref_sparql_endpoint_response_for_concept_multilang")
+def fixture_idref_sparql_endpoint_response_for_concept_multilang(_base_path) -> dict:
+    """
+    Generate an Idref Sparql endpoint concept response
+
+    :param _base_path: test data directory base
+    :return: Idref Sparql endpoint response
+    """
+    return _idref_sparql_endpoint_json_results_from_file(
+        _base_path, "idref_sparql_endpoint_response_for_concept_multilang"
+    )
+
+
+@pytest.fixture(name="idref_sparql_endpoint_response_for_concept_non_preferred_languages")
+def fixture_idref_sparql_endpoint_response_for_concept_concept_non_preferred_languages(
+        _base_path
+) -> dict:
+    """
+    Generate an Idref Sparql endpoint concept response
+
+    :param _base_path: test data directory base
+    :return: Idref Sparql endpoint response
+    """
+    return _idref_sparql_endpoint_json_results_from_file(
+        _base_path, "idref_sparql_endpoint_response_for_concept_non_preferred_languages"
+    )
+
+
 def _idref_sparql_endpoint_json_results_from_file(base_path, file_name) -> dict:
     file_path = f"data/idref_sparql_endpoint/{file_name}.json"
     return _json_data_from_file(base_path, file_path)

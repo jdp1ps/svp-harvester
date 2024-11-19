@@ -1,0 +1,125 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "prefLabel",
+      "altLabel"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Art culinaire"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Patrimoine culinaire"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Et la gastronomie"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Cuisine -- Recettes"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Recettes de cuisine"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Cuisine internationale"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Patrimoine gastronomique"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Contribution \u00E0 la cuisine"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Contribution \u00E0 la gastronomie"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Et la cuisine"
+        }
+      }
+    ]
+  }
+}
