@@ -5,6 +5,7 @@ import aiohttp
 from aiosparql.client import SPARQLClient
 
 from app.harvesters.exceptions.external_endpoint_failure import ExternalEndpointFailure
+from app.utilities.execution_timer_wrapper import execution_timer
 
 DATA_IDREF_FR_URL = "https://data.idref.fr/sparql"
 
@@ -56,6 +57,7 @@ class IdrefSparqlClient:
         ],
     }
 
+    @execution_timer
     async def fetch_publications(self, query: str) -> AsyncGenerator[dict, None]:
         """
         Fetch publications list for a given author from the Idref sparql endpoint

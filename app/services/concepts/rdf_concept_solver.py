@@ -11,6 +11,7 @@ from app.db.models.concept import Concept as DbConcept
 from app.services.concepts.concept_informations import ConceptInformations
 from app.services.concepts.concept_solver import ConceptSolver
 from app.services.concepts.dereferencing_error import DereferencingError
+from app.utilities.execution_timer_wrapper import execution_timer
 
 
 class RdfConceptSolver(ConceptSolver, ABC):
@@ -18,6 +19,7 @@ class RdfConceptSolver(ConceptSolver, ABC):
     Abstract mother class for concept solvers using RDF
     """
 
+    @execution_timer
     async def solve(self, concept_informations: ConceptInformations) -> DbConcept:
         """
         Solves a RDF concept from a concept id

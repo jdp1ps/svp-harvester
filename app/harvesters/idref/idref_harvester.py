@@ -32,6 +32,7 @@ from app.harvesters.xml_harvester_raw_result import (
     XMLHarvesterRawResult as XmlResult,
 )
 from app.services.cache.third_api_cache import ThirdApiCache
+from app.utilities.execution_timer_wrapper import execution_timer
 
 
 class IdrefHarvester(AbstractHarvester):
@@ -176,6 +177,7 @@ class IdrefHarvester(AbstractHarvester):
             logger.info(f"Unknown source {doc['secondary_source']}")
         return coro
 
+    @execution_timer
     async def _query_publication_from_persee_endpoint(self, doc: dict) -> RdfResult:
         uri: str | None = doc.get("uri", "")
         if not uritools.isuri(uri):
@@ -197,6 +199,7 @@ class IdrefHarvester(AbstractHarvester):
             formatter_name=self.Formatters.PERSEE_RDF.value,
         )
 
+    @execution_timer
     async def _query_publication_from_openedition_endpoint(self, doc: dict):
         """
         Query the publications from the OpenEdition API
@@ -220,6 +223,7 @@ class IdrefHarvester(AbstractHarvester):
             formatter_name=self.Formatters.OPEN_EDITION.value,
         )
 
+    @execution_timer
     async def _query_publication_from_sudoc_endpoint(self, doc: dict) -> RdfResult:
         """
         Query the details of a publication from the SUDOC API
@@ -251,6 +255,7 @@ class IdrefHarvester(AbstractHarvester):
             formatter_name=self.Formatters.SUDOC_RDF.value,
         )
 
+    @execution_timer
     async def _convert_publication_from_idref_endpoint(self, doc: dict) -> SparqlResult:
         """
         Query the details of a publication from the IDREF API
@@ -264,6 +269,7 @@ class IdrefHarvester(AbstractHarvester):
             formatter_name=self.Formatters.IDREF_SPARQL.value,
         )
 
+    @execution_timer
     async def _query_publication_from_hal_endpoint(
         self, doc: dict  # pylint: disable=unused-argument
     ) -> RawResult:
@@ -275,6 +281,7 @@ class IdrefHarvester(AbstractHarvester):
         """
         return {}
 
+    @execution_timer
     async def _query_publication_from_science_plus_endpoint(
         self, doc: dict  # pylint: disable=unused-argument
     ) -> RawResult:
