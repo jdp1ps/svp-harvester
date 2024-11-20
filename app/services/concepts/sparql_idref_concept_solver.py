@@ -20,7 +20,8 @@ class SparqlIdRefConceptSolver(ConceptSolver):
 
     def complete_information(self,
                              concept_informations: ConceptInformations
-                             ) -> None:  # pylint:disable=duplicate-code
+                             ) -> None:
+        # pylint:disable=duplicate-code
         """
         Build url, code and/or uri from concept information
         """
