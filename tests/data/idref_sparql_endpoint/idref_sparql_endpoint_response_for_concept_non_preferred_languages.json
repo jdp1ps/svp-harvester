@@ -1,0 +1,63 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "prefLabel",
+      "altLabel"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "Cocina"
+        },
+        "altLabel": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "arte culinario"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "it",
+          "value": "Cucina"
+        },
+        "altLabel": {
+          "type": "literal",
+          "xml:lang": "it",
+          "value": "arte culinaria"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "Cocina"
+        },
+        "altLabel": {
+          "type": "literal",
+          "xml:lang": "it",
+          "value": "arte culinaria"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "it",
+          "value": "Cucina"
+        },
+        "altLabel": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "arte culinario"
+        }
+      }
+    ]
+  }
+}

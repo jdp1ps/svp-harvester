@@ -1,0 +1,106 @@
+{
+  "head": {
+    "link": [],
+    "vars": [
+      "prefLabel",
+      "altLabel"
+    ]
+  },
+  "results": {
+    "distinct": false,
+    "ordered": true,
+    "bindings": [
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Art culinaire"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Kitchen"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Art culinaire"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "Cocina"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Art culinaire"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "value": "Unspecified language preferred label"
+        },
+        "altLabel": {
+          "type": "literal",
+          "value": "Art culinaire"
+        }
+      },
+
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "fr",
+          "value": "Cuisine"
+        },
+        "altLabel": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Culinary art"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Kitchen"
+        },
+        "altLabel": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Culinary art"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "xml:lang": "es",
+          "value": "Cocina"
+        },
+        "altLabel": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Culinary art"
+        }
+      },
+      {
+        "prefLabel": {
+          "type": "literal",
+          "value": "Unspecified language preferred label"
+        },
+        "altLabel": {
+          "type": "literal",
+          "xml:lang": "en",
+          "value": "Culinary art"
+        }
+      }
+    ]
+  }
+}
