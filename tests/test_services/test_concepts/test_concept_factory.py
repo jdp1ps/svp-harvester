@@ -5,7 +5,7 @@ import pytest
 from app.config import get_app_settings
 from app.services.concepts.concept_factory import ConceptFactory
 from app.services.concepts.concept_informations import ConceptInformations
-from app.services.concepts.idref_concept_solver import IdRefConceptSolver
+from app.services.concepts.sparql_idref_concept_solver import SparqlIdRefConceptSolver
 from app.services.concepts.skosmos_jel_concept_solver import SkosmosJelConceptSolver
 from app.services.concepts.sparql_jel_concept_solver import SparqlJelConceptSolver
 from app.services.concepts.unknown_authority_exception import UnknownAuthorityException
@@ -18,7 +18,7 @@ def fixture_mock_idref_concept_solver_solve():
     Mocks the IdRefConceptSolver.solve method
     :return: mock
     """
-    with mock.patch.object(IdRefConceptSolver, "solve") as mock_solve:
+    with mock.patch.object(SparqlIdRefConceptSolver, "solve") as mock_solve:
         yield mock_solve
 
 

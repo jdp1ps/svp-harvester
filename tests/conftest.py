@@ -14,7 +14,7 @@ from app.db.session import engine, Base
 from app.services.concepts.abes_concept_solver import AbesConceptSolver
 from app.services.concepts.concept_informations import ConceptInformations
 from app.services.concepts.dereferencing_error import DereferencingError
-from app.services.concepts.idref_concept_solver import IdRefConceptSolver
+from app.services.concepts.sparql_idref_concept_solver import SparqlIdRefConceptSolver
 from app.harvesters.scanr.scanr_elastic_client import ScanRElasticClient
 from app.services.concepts.sparql_jel_concept_solver import SparqlJelConceptSolver
 from tests.fixtures.common import *  # pylint: disable=unused-import, wildcard-import, unused-wildcard-import
@@ -188,7 +188,7 @@ def fake_abes_concept_solver(concept_informations: ConceptInformations):
 @pytest.fixture(name="mock_idref_concept_solver", autouse=True)
 def fixture_mock_idref_concept_solver():
     """Hal harvester mock to detect is_relevant method calls."""
-    with mock.patch.object(IdRefConceptSolver, "solve") as mock_solve:
+    with mock.patch.object(SparqlIdRefConceptSolver, "solve") as mock_solve:
         mock_solve.side_effect = fake_idref_concept_solver
         yield mock_solve
 
