@@ -211,7 +211,7 @@ or
 APP_ENV=DEV python3 app/main.py 
 ```
 
-# Templates I18N
+# I18N Templates
 
 To update the translation files, run the following command from the project root :
 
