@@ -5,22 +5,12 @@ Overview
 
 It is intended to provide a unified interface to the various scholarly publication databases and repositories that are used by an institutional research information system or a bibliographic data management system.
 
-Project repository and live demo 📺
------------------------------------
+Project repository
+------------------
 .. |ico1| image:: https://img.shields.io/badge/GitHub--repository-svp--harvester-blue?style=flat-square&logo=github
     :target: https://github.com/CRISalid-esr/svp-harvester#readme
     :alt: GitHub repository
-|ico1| Source code is available on Github
-
-.. |ico2| image:: https://img.shields.io/badge/GKE-demo-green?style=flat-square&logo=google-cloud
-    :target: http://34.163.175.52/admin/retrieve?locale=fr_FR
-    :alt: GKE Démo
-
-|ico2| A live demo on Google Kubernetes Engine
-
-🕘 The demo reflects the current state of development and has no guarantee of stability.
-
-🛠️ The presented interface is intended for administration and debugging purposes and is not for end-users.
+Source code is available on Github : |ico1|
 
 .. note:: SoVisu+ Harvester belongs to the SoVisu+ project, which aims to provide a set of robust and scalable components to build research information management systems. But it may also be used as a standalone tool or integrated to a completely different system.
 
