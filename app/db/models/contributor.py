@@ -4,6 +4,7 @@ from sqlalchemy import String, Index
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.db.models.contributor_identifiers import contributor_identifiers_table
 from app.db.session import Base
 
 
@@ -26,6 +27,14 @@ class Contributor(Base):
         back_populates="contributor",
         cascade="all, delete-orphan",
         lazy="raise",
+    )
+
+    identifiers: Mapped[
+        List["app.db.models.contributor_identifier.ExternalPersonIdentifier"]
+    ] = relationship(
+        "app.db.models.contributor_identifier.ContributorIdentifier",
+        secondary=contributor_identifiers_table,
+        lazy="joined",
     )
 
     # use postgresql array type
