@@ -1,5 +1,5 @@
 import re
-from typing import Generator, List
+from typing import Generator, Set
 
 from loguru import logger
 from semver import Version
@@ -349,7 +349,7 @@ class HalReferencesConverter(AbstractReferencesConverter):
 
     def _organizations_from_contributor(
         self, raw_data, id_contributor
-    ) -> List[OrganizationInformations]:
+    ) -> Set[OrganizationInformations]:
         # Get the organizations informations of the contributor
         organizations = set()
 

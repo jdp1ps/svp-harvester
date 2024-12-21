@@ -1,10 +1,7 @@
-import datetime
-
 import pytest
 from semver import VersionInfo
 
 from app.db.daos.contributor_dao import ContributorDAO
-from app.db.models.contribution import Contribution
 from app.db.session import async_session
 from app.harvesters.hal.hal_references_converter import HalReferencesConverter
 from app.harvesters.json_harvester_raw_result import JsonHarvesterRawResult

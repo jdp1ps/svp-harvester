@@ -57,10 +57,10 @@ class ContributorDAO(AbstractDAO):
 
     async def update_external_identifiers(
         self, contributor_id: int, ext_identifiers: List[dict[str, str]] = []
-    ) -> List[ExternalPersonIdentifier]:
+    ) -> None:
         """
         Update external identifiers of a contributor
-        :param contributor: contributor to update
+        :param contributor_id: id of the contributor to update
         :param ext_identifiers: list of external identifiers
         :return: None
         """

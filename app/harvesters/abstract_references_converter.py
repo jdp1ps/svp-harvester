@@ -212,7 +212,7 @@ class AbstractReferencesConverter(ABC):
         """
         Populates raw data from harvester source to the normalised Reference object
         :param raw_data: Raw data from harvester source
-        :param reference: Reference object
+        :param new_ref: Reference object with basic information
         :return: Normalised Reference object with basic information
         """
 
