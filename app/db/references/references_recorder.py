@@ -139,6 +139,12 @@ class ReferencesRecorder:
                     contrib.affiliations = [
                         await session.merge(org) for org in contrib.affiliations
                     ]
+                    if contrib.contributor:
+                        contrib.contributor = await session.merge(contrib.contributor)
+                        contrib.contributor.identifiers = [
+                            await session.merge(identifier)
+                            for identifier in contrib.contributor.identifiers
+                        ]
                 new_ref.document_type = [
                     await session.merge(doc_type) for doc_type in new_ref.document_type
                 ]

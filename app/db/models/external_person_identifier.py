@@ -1,7 +1,7 @@
 from enum import Enum
 
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, validates
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, validates, relationship
 
 from app.db.session import Base
 
@@ -15,9 +15,12 @@ class ExternalPersonIdentifier(Base):
         """Enum for identifier types"""
 
         ORCID = "orcid"
-        IDHAL = "id_hal"
+        IDHAL = "idhal"
         IDREF = "idref"
         SCOPUS = "scopus"
+        GOOGLE_SCHOLAR = "google_scholar"
+        VIAF = "viaf"
+        ISNI = "isni"
 
     __tablename__ = "external_person_identifiers"
 
@@ -26,7 +29,15 @@ class ExternalPersonIdentifier(Base):
     value: Mapped[str] = mapped_column(nullable=False, index=True)
     source: Mapped[str] = mapped_column(nullable=False, index=True)
 
-    __table_args__ = (UniqueConstraint("source", "type", "value"),)
+    contributor_id: Mapped[int] = mapped_column(
+        ForeignKey("contributors.id"), nullable=False, index=True
+    )
+    contributor: Mapped["app.db.models.contributor.Contributor"] = relationship(
+        "app.db.models.contributor.Contributor",
+        back_populates="identifiers",
+        lazy="joined",
+        cascade="all",
+    )
 
     @validates("type", include_removes=False, include_backrefs=True)
     def _valid_identifier_is_among_supported_types(self, _, new_type):
@@ -34,5 +45,5 @@ class ExternalPersonIdentifier(Base):
         Validate that the identifier is among the supported types
         """
         if new_type not in [identifier.value for identifier in self.IdentifierType]:
-            raise ValueError("Identifier type is not among the supported types")
+            raise ValueError(f"Identifier type {new_type} is not supported")
         return new_type

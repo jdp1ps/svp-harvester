@@ -4,8 +4,10 @@ from sqlalchemy import String, Index
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.models.contributor_identifiers import contributor_identifiers_table
 from app.db.session import Base
+from app.db.models.external_person_identifier import (  # pylint: disable=unused-import
+    ExternalPersonIdentifier,
+)
 
 
 class Contributor(Base):
@@ -33,7 +35,8 @@ class Contributor(Base):
         List["app.db.models.external_person_identifier.ExternalPersonIdentifier"]
     ] = relationship(
         "app.db.models.external_person_identifier.ExternalPersonIdentifier",
-        secondary=contributor_identifiers_table,
+        back_populates="contributor",
+        cascade="all, delete-orphan",
         lazy="joined",
     )
 

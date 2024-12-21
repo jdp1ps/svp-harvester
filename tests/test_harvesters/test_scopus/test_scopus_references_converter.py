@@ -3,10 +3,12 @@ import datetime
 import pytest
 from semver import VersionInfo
 
+from app.db.daos.contributor_dao import ContributorDAO
+from app.db.models.contribution import Contribution
+from app.db.session import async_session
 from app.harvesters.scopus.scopus_client import ScopusClient
 from app.harvesters.scopus.scopus_references_converter import ScopusReferencesConverter
 from app.harvesters.xml_harvester_raw_result import XMLHarvesterRawResult
-from app.db.models.contribution import Contribution
 
 
 @pytest.mark.asyncio
@@ -74,6 +76,29 @@ async def test_convert(scopus_xml_raw_result_for_doc: XMLHarvesterRawResult):
     assert test_reference.issue.volume == expected_volume_issue
     assert expected_number_issue in test_reference.issue.number
     assert test_reference.issued == expected_issued
+
+    contribution = test_reference.contributions[0]
+    contributor_id = contribution.contributor.id
+    assert contributor_id is not None
+    assert isinstance(contributor_id, int)
+    async with async_session() as session:
+        async with session.begin_nested():
+            contributor = await ContributorDAO(session).get_by_id(contributor_id)
+            assert contributor is not None
+            assert len(contributor.identifiers) == 2
+            assert any(
+                [
+                    identifier.type == "orcid"
+                    and identifier.value == "0000-0002-5201-3968"
+                    for identifier in contributor.identifiers
+                ]
+            )
+            assert any(
+                [
+                    identifier.type == "scopus" and identifier.value == "57539748900"
+                    for identifier in contributor.identifiers
+                ]
+            )
 
 
 @pytest.mark.asyncio

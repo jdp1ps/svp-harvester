@@ -66,6 +66,7 @@ class AbstractReferencesConverter(ABC):
         rank: int | None = None
         name: str | None = None
         identifier: str | None = None
+        ext_identifiers: List[dict[str, str]] = None
 
     async def _contributions(
         self,
@@ -83,6 +84,7 @@ class AbstractReferencesConverter(ABC):
         for contribution_information in contribution_informations:
             identifier = contribution_information.identifier
             name = contribution_information.name
+            ext_identifiers = contribution_information.ext_identifiers
             assert (
                 identifier is not None or name is not None
             ), "No identifier or name provided for contributor"
@@ -94,12 +96,13 @@ class AbstractReferencesConverter(ABC):
                 if identifier is not None:
                     db_contributor = (
                         await self._get_or_create_contributor_by_identifier(
-                            source=source,
-                            source_identifier=identifier,
-                            name=name,
+                            source=source, source_identifier=identifier, name=name
                         )
                     )
                     self._update_contributor_name(db_contributor, name)
+                    await self._update_contributor_external_identifiers(
+                        db_contributor, ext_identifiers
+                    )
                 else:
                     db_contributor = await self._get_or_create_contributor_by_name(
                         source=source, name=name
@@ -114,6 +117,18 @@ class AbstractReferencesConverter(ABC):
                 role=contribution_information.role,
                 rank=contribution_information.rank,
             )
+
+    async def _update_contributor_external_identifiers(
+        self, db_contributor: Contributor, ext_identifiers: List[dict[str, str]]
+    ):
+        """
+        Update the external identifiers of the contributor
+        """
+        async with async_session() as session:
+            async with session.begin():
+                await ContributorDAO(session).update_external_identifiers(
+                    db_contributor.id, ext_identifiers
+                )
 
     @staticmethod
     def validate_reference(func):
@@ -243,7 +258,11 @@ class AbstractReferencesConverter(ABC):
         return contributor
 
     async def _get_or_create_contributor_by_identifier(
-        self, source: str, source_identifier: str, name: str, new_attempt: bool = False
+        self,
+        source: str,
+        source_identifier: str,
+        name: str,
+        new_attempt: bool = False,
     ):
         async with async_session() as session:
             async with session.begin_nested():
@@ -276,7 +295,6 @@ class AbstractReferencesConverter(ABC):
                                 new_attempt=True,
                             )
                         )
-
         return contributor
 
     async def _get_or_create_concept_by_label(
