@@ -30,9 +30,9 @@ class Contributor(Base):
     )
 
     identifiers: Mapped[
-        List["app.db.models.contributor_identifier.ExternalPersonIdentifier"]
+        List["app.db.models.external_person_identifier.ExternalPersonIdentifier"]
     ] = relationship(
-        "app.db.models.contributor_identifier.ContributorIdentifier",
+        "app.db.models.external_person_identifier.ExternalPersonIdentifier",
         secondary=contributor_identifiers_table,
         lazy="joined",
     )
