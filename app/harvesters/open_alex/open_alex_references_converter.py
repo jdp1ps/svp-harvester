@@ -221,12 +221,27 @@ class OpenAlexReferencesConverter(AbstractReferencesConverter):
             author = author_object.get("author")
             name = author.get("display_name")
             id_open_alex = author.get("id")
+            orcid = author.get("orcid")
+            ext_identifiers = [
+                {
+                    "type": "open_alex",
+                    "value": id_open_alex,
+                }
+            ]
+            if orcid:
+                ext_identifiers.append(
+                    {
+                        "type": "orcid",
+                        "value": orcid,
+                    }
+                )
             contribution_informations.append(
                 AbstractReferencesConverter.ContributionInformations(
                     role=Contribution.get_url("AUT"),
                     identifier=id_open_alex,
                     name=name,
                     rank=rank_count,
+                    ext_identifiers=ext_identifiers,
                 )
             )
             rank_count += 1

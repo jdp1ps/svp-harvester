@@ -56,7 +56,7 @@ class ContributorDAO(AbstractDAO):
         return (await self.db_session.execute(stmt)).unique().scalars().one_or_none()
 
     async def update_external_identifiers(
-        self, contributor_id: int, ext_identifiers: List[dict[str, str]] = []
+        self, contributor_id: int, ext_identifiers: List[dict[str, str]]
     ) -> None:
         """
         Update external identifiers of a contributor
@@ -69,7 +69,7 @@ class ContributorDAO(AbstractDAO):
 
         ext_identifiers = [
             identifier
-            for identifier in ext_identifiers
+            for identifier in (ext_identifiers or [])
             if identifier["type"] in valid_types
         ]
 
