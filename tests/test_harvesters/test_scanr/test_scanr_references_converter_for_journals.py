@@ -24,6 +24,10 @@ def fixture_scanr_publication_doc_with_journal_with_title(
     return scanr_publication_doc_with_journal_with_title["hits"]["hits"]
 
 
+import pytest
+
+
+@pytest.mark.current
 async def test_convert_publication_with_journal_without_title(
     scanr_publication_doc_with_journal_without_title,
 ):
@@ -37,8 +41,9 @@ async def test_convert_publication_with_journal_without_title(
         test_reference = converter_under_tests.build(
             raw_data=result, harvester_version=VersionInfo.parse("0.0.0")
         )
-        with pytest.raises(UnexpectedFormatException):
-            await converter_under_tests.convert(raw_data=result, new_ref=test_reference)
+        await converter_under_tests.convert(raw_data=result, new_ref=test_reference)
+        journal = test_reference.issue.journal
+        assert "Missing ScanR journal title" in journal.titles
 
 
 async def test_convert_publication_with_journal_with_title(
