@@ -283,7 +283,7 @@ async def test_convert_work_with_hal_locations(
     When the converter is called
     Then the converter should infer Hal identifiers from HAL URLs
 
-    :param open_alex_work_with_various_locations:
+    :param open_alex_work_with_hal_locations:
     :return:
     """
     converter_under_tests = OpenAlexReferencesConverter()

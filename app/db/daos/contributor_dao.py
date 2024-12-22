@@ -13,7 +13,7 @@ class ContributorDAO(AbstractDAO):
     Data access object for contributors
     """
 
-    async def get_by_id(self, contributor_id: int) -> Contributor:
+    async def get_by_id(self, contributor_id: int) -> Contributor | None:
         """
         Get a contributor by its id
         :param contributor_id: id of the contributor
