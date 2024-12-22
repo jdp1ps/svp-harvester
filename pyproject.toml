@@ -29,6 +29,7 @@ aioredis = "^2.0.1"
 isbnlib = "^3.10.14"
 semver = "^3.0.2"
 apscheduler = "^3.10.4"
+lxml = "^5.3.0"
 
 [tool.poetry.group.development]
 optional = true
