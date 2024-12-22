@@ -53,7 +53,7 @@ class AMQPMessageProcessor:
 
         while True:
             requeue = False
-            start_time = None
+            start_time = datetime.now()
             try:
                 message = await self.tasks_queue.get()
                 start_time = datetime.now()
