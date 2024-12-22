@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from app.models.external_person_identifiers import ExternalPersonIdentifier
+from app.models.contributor_identifier import ContributorIdentifier
 
 
 class Contributor(BaseModel):
@@ -18,4 +18,4 @@ class Contributor(BaseModel):
 
     name_variants: list[str] = []
 
-    identifiers: list[ExternalPersonIdentifier] = []
+    identifiers: list[ContributorIdentifier] = []

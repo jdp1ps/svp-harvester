@@ -26,9 +26,9 @@ from app.db.models.reference_manifestation import (  # pylint: disable=unused-im
     ReferenceManifestation,
 )
 from app.db.models.book import Book  # pylint: disable=unused-import
-from app.db.models.external_person_identifier import (
-    ExternalPersonIdentifier,
-)  # pylint: disable=unused-import
+from app.db.models.contributor_identifier import (  # pylint: disable=unused-import
+    ContributorIdentifier,
+)
 
 
 class Reference(Base, VersionedRecord):

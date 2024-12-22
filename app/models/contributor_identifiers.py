@@ -5,7 +5,7 @@ Identifiers model
 from pydantic import BaseModel, ConfigDict
 
 
-class ExternalPersonIdentifier(BaseModel):
+class ContributorIdentifier(BaseModel):
     """External person identifier model"""
 
     model_config = ConfigDict(from_attributes=True)

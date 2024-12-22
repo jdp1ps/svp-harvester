@@ -1,8 +1,14 @@
-from lxml import etree
 from typing import List, Dict
+
+from loguru import logger
+from lxml import etree
 
 
 class HalTEIDecoder:
+    """
+    Wrapper for HAL API TEI (from "base_xml" field) to extract author identifiers.
+    """
+
     def __init__(self, tei_raw_data: str):
         """
         Constructor to initialize with TEI raw data.
@@ -13,7 +19,8 @@ class HalTEIDecoder:
         try:
             self.tree = etree.fromstring(tei_raw_data.encode("utf-8"))
         except etree.XMLSyntaxError as e:
-            raise ValueError(f"Invalid TEI XML data: {e}")
+            logger.error(f"TEI XML data are not usable: {e}")
+            self.tree = None
 
     def get_identifiers(self, numeric_id_hal: int) -> List[Dict[str, str]]:
         """
@@ -25,8 +32,14 @@ class HalTEIDecoder:
         namespace = {"tei": "http://www.tei-c.org/ns/1.0"}
         identifiers = []
 
+        if not self.tree:
+            return identifiers  # Return empty if the TEI XML data are not usable
+
         # XPath to find the specific author with the given numeric HAL ID
-        xpath = f"//tei:author[.//tei:idno[@type='idhal'][@notation='numeric' and text()='{numeric_id_hal}']]"
+        xpath = (
+            f"//tei:author[.//tei:idno[@type='idhal'][@notation='numeric' "
+            f"and text()='{numeric_id_hal}']]"
+        )
         author_elements = self.tree.xpath(xpath, namespaces=namespace)
 
         if not author_elements:

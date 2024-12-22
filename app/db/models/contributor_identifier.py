@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, validates, relationship
 from app.db.session import Base
 
 
-class ExternalPersonIdentifier(Base):
+class ContributorIdentifier(Base):
     """
     Model for persistence of identifiers
     """
@@ -23,7 +23,7 @@ class ExternalPersonIdentifier(Base):
         VIAF = "viaf"
         ISNI = "isni"
 
-    __tablename__ = "external_person_identifiers"
+    __tablename__ = "contributor_identifier"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(nullable=False, index=True)

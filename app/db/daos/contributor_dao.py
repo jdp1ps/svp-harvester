@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 
 from app.db.abstract_dao import AbstractDAO
 from app.db.models.contributor import Contributor
-from app.db.models.external_person_identifier import ExternalPersonIdentifier
+from app.db.models.contributor_identifier import ContributorIdentifier
 
 
 class ContributorDAO(AbstractDAO):
@@ -90,7 +90,7 @@ class ContributorDAO(AbstractDAO):
             await self.db_session.delete(identifier)
 
         for identifier_type, identifier_value in identifiers_to_add:
-            new_identifier = ExternalPersonIdentifier(
+            new_identifier = ContributorIdentifier(
                 type=identifier_type,
                 value=identifier_value,
                 source=contributor.source,
@@ -100,6 +100,6 @@ class ContributorDAO(AbstractDAO):
 
     def _get_valid_external_identifier_types(self):
         valid_types = {
-            identifier.value for identifier in ExternalPersonIdentifier.IdentifierType
+            identifier.value for identifier in ContributorIdentifier.IdentifierType
         }
         return valid_types

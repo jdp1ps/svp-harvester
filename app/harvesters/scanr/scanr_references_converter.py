@@ -5,7 +5,7 @@ from similarity.normalized_levenshtein import NormalizedLevenshtein
 
 from app.config import get_app_settings
 from app.db.models.abstract import Abstract
-from app.db.models.external_person_identifier import ExternalPersonIdentifier
+from app.db.models.contributor_identifier import ContributorIdentifier
 from app.db.models.issue import Issue
 from app.db.models.journal import Journal
 from app.db.models.reference import Reference
@@ -44,9 +44,9 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
     IDENTIFIERS_TO_IGNORE = ["scanr"]
 
     CONTRIBUTORS_IDENTIFIERS_TYPE_MAPPING = {
-        "idref": ExternalPersonIdentifier.IdentifierType.IDREF.value,
-        "orcid": ExternalPersonIdentifier.IdentifierType.ORCID.value,
-        "id_hal": ExternalPersonIdentifier.IdentifierType.IDHAL.value,
+        "idref": ContributorIdentifier.IdentifierType.IDREF.value,
+        "orcid": ContributorIdentifier.IdentifierType.ORCID.value,
+        "id_hal": ContributorIdentifier.IdentifierType.IDHAL.value,
     }
 
     SOURCE_MAPPING = {
