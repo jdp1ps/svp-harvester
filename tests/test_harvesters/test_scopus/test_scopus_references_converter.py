@@ -89,7 +89,7 @@ async def test_convert(scopus_xml_raw_result_for_doc: XMLHarvesterRawResult):
             assert any(
                 [
                     identifier.type == "orcid"
-                    and identifier.value == "0000-0002-5201-3968"
+                    and identifier.value == "https://orcid.org/0000-0002-5201-3968"
                     for identifier in contributor.identifiers
                 ]
             )
