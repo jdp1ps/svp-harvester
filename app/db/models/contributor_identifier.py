@@ -37,7 +37,6 @@ class ContributorIdentifier(Base):
         "app.db.models.contributor.Contributor",
         back_populates="identifiers",
         lazy="joined",
-        cascade="all",
     )
 
     @validates("type", include_removes=False, include_backrefs=True)
