@@ -23,7 +23,7 @@ class Identifier(Base):
     __table_args__ = (UniqueConstraint("type", "value"),)
 
     @validates("type", include_removes=False, include_backrefs=True)
-    def _valide_identifier_is_referenced_by_settings(self, _, new_type):
+    def _valid_identifier_is_referenced_by_settings(self, _, new_type):
         """
         Validate that the identifier is referenced by the settings
         """

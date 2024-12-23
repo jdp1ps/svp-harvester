@@ -5,3 +5,5 @@ disable=missing-module-docstring,
 ignore-paths=.*alembic/versions/.*$
 
 init-hook='import sys; sys.path.append(".")'
+
+extension-pkg-allow-list=lxml

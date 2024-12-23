@@ -5,6 +5,7 @@ from similarity.normalized_levenshtein import NormalizedLevenshtein
 
 from app.config import get_app_settings
 from app.db.models.abstract import Abstract
+from app.db.models.contributor_identifier import ContributorIdentifier
 from app.db.models.issue import Issue
 from app.db.models.journal import Journal
 from app.db.models.reference import Reference
@@ -41,6 +42,12 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
     PREFERRED_LANGUAGE = "fr"
 
     IDENTIFIERS_TO_IGNORE = ["scanr"]
+
+    CONTRIBUTORS_IDENTIFIERS_TYPE_MAPPING = {
+        "idref": ContributorIdentifier.IdentifierType.IDREF.value,
+        "orcid": ContributorIdentifier.IdentifierType.ORCID.value,
+        "id_hal": ContributorIdentifier.IdentifierType.IDHAL.value,
+    }
 
     SOURCE_MAPPING = {
         "wikidata": ConceptInformations.ConceptSources.WIKIDATA,
@@ -148,10 +155,11 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
             return None
         title = json_payload["_source"].get("source").get("title")
         if not title:
-            raise UnexpectedFormatException(
+            logger.error(
                 "Journal title is missing in the ScanR source field "
                 f"for the ScanR reference {json_payload['_id']}"
             )
+            title = "Missing ScanR journal title"
         issn = json_payload["_source"].get("source").get("journalIssns", [])
         publisher = json_payload["_source"].get("source").get("publisher")
         journal = await self._get_or_create_journal(
@@ -181,21 +189,33 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
 
     async def _add_contributions(self, json_payload: dict, new_ref: Reference) -> None:
         raw_contributions = json_payload["_source"].get("authors")
-        contribution_informations = [
-            AbstractReferencesConverter.ContributionInformations(
-                role=ScanrRolesConverter.convert(
-                    role=contribution.get("role"),
-                ),
-                name=contribution.get("fullName"),
-                identifier=contribution.get("person"),
-                rank=rank,
+        contribution_informations = []
+        for rank, contribution in enumerate(raw_contributions):
+            raw_identifiers = contribution.get("denormalized", {})
+            contribution_informations.append(
+                AbstractReferencesConverter.ContributionInformations(
+                    role=ScanrRolesConverter.convert(
+                        role=contribution.get("role"),
+                    ),
+                    name=contribution.get("fullName"),
+                    identifier=contribution.get("person"),
+                    rank=rank,
+                    ext_identifiers=self._convert_external_identifiers(raw_identifiers),
+                )
             )
-            for rank, contribution in enumerate(raw_contributions)
-        ]
         async for contribution in self._contributions(
             contribution_informations=contribution_informations, source="scanr"
         ):
             new_ref.contributions.append(contribution)
+
+    def _convert_external_identifiers(
+        self, raw_identifiers: dict
+    ) -> list[dict[str, str]]:
+        return [
+            {"type": self.CONTRIBUTORS_IDENTIFIERS_TYPE_MAPPING[key], "value": value}
+            for key, value in raw_identifiers.items()
+            if key in self.CONTRIBUTORS_IDENTIFIERS_TYPE_MAPPING
+        ]
 
     @staticmethod
     def _remove_duplicates_from_language_data(language_data: dict, model_class):

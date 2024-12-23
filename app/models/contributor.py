@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
+from app.models.contributor_identifier import ContributorIdentifier
+
 
 class Contributor(BaseModel):
     """
@@ -15,3 +17,5 @@ class Contributor(BaseModel):
     name: str
 
     name_variants: list[str] = []
+
+    identifiers: list[ContributorIdentifier] = []

@@ -1,5 +1,5 @@
 import re
-from typing import Generator, List
+from typing import Generator, Set
 
 from loguru import logger
 from semver import Version
@@ -18,6 +18,7 @@ from app.harvesters.exceptions.unexpected_format_exception import (
 )
 from app.harvesters.hal.hal_document_type_converter import HalDocumentTypeConverter
 from app.harvesters.hal.hal_roles_converter import HalRolesConverter
+from app.harvesters.hal.hal_tei_interface import HalTEIDecoder
 from app.harvesters.json_harvester_raw_result import (
     JsonHarvesterRawResult as JsonRawResult,
 )
@@ -74,6 +75,8 @@ class HalReferencesConverter(AbstractReferencesConverter):
         :return: None
         """
         json_payload = raw_data.payload
+        tei_decoder = self._build_tei_decoder(json_payload)
+
         [  # pylint: disable=expression-not-assigned
             new_ref.identifiers.append(identifier)
             for identifier in self._identifiers(json_payload)
@@ -108,7 +111,8 @@ class HalReferencesConverter(AbstractReferencesConverter):
                 map(lambda s: s.id, new_ref.subjects)
             ):
                 new_ref.subjects.append(subject)
-        await self._add_contributions(json_payload, new_ref)
+
+        await self._add_contributions(json_payload, new_ref, tei_decoder)
 
         self._add_hal_manifestation(json_payload, new_ref)
 
@@ -131,6 +135,13 @@ class HalReferencesConverter(AbstractReferencesConverter):
                 new_ref.book = book
 
         await self._add_organization(json_payload, new_ref)
+
+    def _build_tei_decoder(self, json_payload):
+        tei_decoder = None
+        tei_payload = json_payload.get("label_xml", None)
+        if tei_payload:
+            tei_decoder = HalTEIDecoder(tei_raw_data=tei_payload)
+        return tei_decoder
 
     def _add_created_date(self, json_payload, new_ref):
         try:
@@ -286,7 +297,9 @@ class HalReferencesConverter(AbstractReferencesConverter):
                     )
                 )
 
-    async def _add_contributions(self, raw_data: dict, new_ref: Reference) -> None:
+    async def _add_contributions(
+        self, raw_data: dict, new_ref: Reference, tei_decoder: HalTEIDecoder = None
+    ) -> None:
         if len(raw_data.get("authQuality_s", [])) != len(
             raw_data.get("authFullNameFormIDPersonIDIDHal_fs", [])
         ):
@@ -314,6 +327,9 @@ class HalReferencesConverter(AbstractReferencesConverter):
                     identifier=id_hal if id_hal != "0" else None,
                     name=name,
                     rank=rank,
+                    ext_identifiers=tei_decoder.get_identifiers(id_hal)
+                    if tei_decoder
+                    else [],
                 )
             )
         async for contribution in self._contributions(
@@ -333,7 +349,7 @@ class HalReferencesConverter(AbstractReferencesConverter):
 
     def _organizations_from_contributor(
         self, raw_data, id_contributor
-    ) -> List[OrganizationInformations]:
+    ) -> Set[OrganizationInformations]:
         # Get the organizations informations of the contributor
         organizations = set()
 

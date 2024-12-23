@@ -5,6 +5,9 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
+from app.db.models.contributor_identifier import (  # pylint: disable=unused-import
+    ContributorIdentifier,
+)
 
 
 class Contributor(Base):
@@ -26,6 +29,15 @@ class Contributor(Base):
         back_populates="contributor",
         cascade="all, delete-orphan",
         lazy="raise",
+    )
+
+    identifiers: Mapped[
+        List["app.db.models.contributor_identifier.ContributorIdentifier"]
+    ] = relationship(
+        "app.db.models.contributor_identifier.ContributorIdentifier",
+        back_populates="contributor",
+        cascade="all, delete-orphan",
+        lazy="joined",
     )
 
     # use postgresql array type

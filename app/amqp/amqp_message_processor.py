@@ -28,11 +28,11 @@ class AMQPMessageProcessor:
     MAX_EXPECTED_RESULTS = 10000
 
     def __init__(
-            self,
-            exchange: aio_pika.Exchange,
-            tasks_queue: asyncio.Queue,
-            settings: AppSettings,
-            reconnect_event: asyncio.Event,
+        self,
+        exchange: aio_pika.Exchange,
+        tasks_queue: asyncio.Queue,
+        settings: AppSettings,
+        reconnect_event: asyncio.Event,
     ):
         self.exchange = exchange
         self.tasks_queue = tasks_queue
@@ -53,73 +53,105 @@ class AMQPMessageProcessor:
 
         while True:
             requeue = False
-            start_time = None
+            start_time = datetime.now()
             try:
                 message = await self.tasks_queue.get()
-                message_id = message.message_id
                 start_time = datetime.now()
-                payload: bytes = message.body
-                async with message.process(ignore_processed=True):
-                    payload = message.body
-                    ack_time = datetime.now()
-                    logger.debug(
-                        f"Message {message_id}  acked by {worker_id} in {ack_time - start_time}"
-                    )
+                payload = await self._get_message_payload(
+                    message, start_time, worker_id
+                )
                 await self._process_message(payload)
                 self.tasks_queue.task_done()
                 logger.debug(
-                    f"Message {message_id}  processed by {worker_id} in {datetime.now() - ack_time}"
+                    f"Message {message.message_id}  processed by {worker_id} in "
+                    f"{datetime.now() - start_time}"
                 )
             except ChannelInvalidStateError as channel_error:
-                logger.error(
-                    f"Channel invalid state error during {worker_id} "
-                    f"message ack: {channel_error}"
-                )
-                self.reconnect_event.set()
+                await self._handle_channel_failure(channel_error, worker_id)
                 return
             except AMQPError as ack_error:
-                logger.error(
-                    f"AMQP error occurred during {worker_id} message ack: {ack_error}"
-                )
-                self.reconnect_event.set()
+                requeue = await self._handle_amqp_error(ack_error, worker_id)
             except KeyboardInterrupt as keyboard_interrupt:
-                logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
-                if message is not None and not message.processed:
-                    await message.nack(requeue=True)
-                raise keyboard_interrupt
+                await self._handle_application_stop(
+                    keyboard_interrupt, message, worker_id
+                )
             except InvalidEntityError as invalid_entity_error:
-                logger.error(f"Invalid entity submitted : {invalid_entity_error}")
-                requeue = False
+                requeue = await self._handle_invalid_entity(invalid_entity_error)
             except (ConnectionError, PostgresConnectionError) as connection_error:
-                logger.error(
-                    f"Connection refused during {worker_id} message processing : {connection_error}"
-                )
-                requeue = True
-            except Exception as e:  # pylint: disable=broad-exception-caught
-                logger.error(
-                    f"Unexpected exception during {worker_id} message processing: {e}"
-                )
-                logger.error(traceback.format_exc())
+                requeue = await self._handle_database_error(connection_error, worker_id)
+            except Exception as exception:  # pylint: disable=broad-exception-caught
+                requeue = await self._handle_unexpected_error(exception, worker_id)
             finally:
-                if message is not None and not message.processed:
-                    try:
-                        await message.nack(requeue=requeue)
-                    except ChannelInvalidStateError as channel_error:
-                        logger.error(
-                            f"Error during message nack for {worker_id} : {channel_error}"
-                        )
-                        self.reconnect_event.set()
-                    except AMQPError as nack_error:
-                        logger.error(
-                            f"AMQP error during message nack for {worker_id} : {nack_error}"
-                        )
-                        self.reconnect_event.set()
-                    self.tasks_queue.task_done()
+                await self._post_process_message(message, requeue, worker_id)
                 end_time = datetime.now()
                 logger.warning(
                     f"Performance : Message  processed by {worker_id} "
                     f"in {end_time - start_time} for payload {payload}"
                 )
+
+    async def _post_process_message(self, message, requeue, worker_id):
+        if message is not None and not message.processed:
+            try:
+                await message.nack(requeue=requeue)
+            except ChannelInvalidStateError as channel_error:
+                logger.error(
+                    f"Error during message nack for {worker_id} : {channel_error}"
+                )
+                self.reconnect_event.set()
+            except AMQPError as nack_error:
+                logger.error(
+                    f"AMQP error during message nack for {worker_id} : {nack_error}"
+                )
+                self.reconnect_event.set()
+            self.tasks_queue.task_done()
+
+    async def _handle_unexpected_error(self, exception, worker_id):
+        logger.error(
+            f"Unexpected exception during {worker_id} message processing: {exception}"
+        )
+        logger.error(traceback.format_exc())
+        return True
+
+    async def _handle_database_error(self, connection_error, worker_id):
+        logger.error(
+            f"Connection refused during {worker_id} message processing : {connection_error}"
+        )
+        return True
+
+    @staticmethod
+    async def _handle_invalid_entity(invalid_entity_error):
+        logger.error(f"Invalid entity submitted : {invalid_entity_error}")
+        return False
+
+    @staticmethod
+    async def _handle_application_stop(keyboard_interrupt, message, worker_id):
+        logger.warning(f"Amqp connect worker {worker_id} has been cancelled")
+        if message is not None and not message.processed:
+            await message.nack(requeue=True)
+        raise keyboard_interrupt
+
+    async def _handle_amqp_error(self, ack_error, worker_id):
+        logger.error(f"AMQP error occurred during {worker_id} message ack: {ack_error}")
+        self.reconnect_event.set()
+        return True
+
+    async def _handle_channel_failure(self, channel_error, worker_id):
+        logger.error(
+            f"Channel invalid state error during {worker_id} "
+            f"message ack: {channel_error}"
+        )
+        self.reconnect_event.set()
+
+    @staticmethod
+    async def _get_message_payload(message, start_time, worker_id):
+        payload: bytes = None
+        async with message.process(ignore_processed=True):
+            payload = message.body
+            ack_time = datetime.now()
+            logger.debug(
+                f"Message {message.message_id}  acked by {worker_id} in {ack_time - start_time}"
+            )
+        return payload
 
     async def _process_message(self, payload: str, timeout=DEFAULT_RESULT_TIMEOUT):
         json_payload = json.loads(payload)
@@ -134,7 +166,7 @@ class AMQPMessageProcessor:
                         "type": "Retrieval",
                         "error": True,
                         "message": f"Entity validation error,"
-                                   f" retrieval aborted: {validation_error}",
+                        f" retrieval aborted: {validation_error}",
                         "parameters": json_payload,
                     }
                 )
@@ -200,7 +232,7 @@ class AMQPMessageProcessor:
                 listen.cancel()
 
     async def _wait_for_retrieval_result(
-            self, result_queue: asyncio.Queue, retrieval: Retrieval, timeout: int
+        self, result_queue: asyncio.Queue, retrieval: Retrieval, timeout: int
     ):
         try:
             while True:

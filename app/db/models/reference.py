@@ -26,6 +26,9 @@ from app.db.models.reference_manifestation import (  # pylint: disable=unused-im
     ReferenceManifestation,
 )
 from app.db.models.book import Book  # pylint: disable=unused-import
+from app.db.models.contributor_identifier import (  # pylint: disable=unused-import
+    ContributorIdentifier,
+)
 
 
 class Reference(Base, VersionedRecord):
@@ -89,30 +92,30 @@ class Reference(Base, VersionedRecord):
         lazy="noload",
     )
 
-    document_type: Mapped[List["app.db.models.document_type.DocumentType"]] = (
-        relationship(
-            "app.db.models.document_type.DocumentType",
-            secondary=references_document_type_table,
-            lazy="joined",
-        )
+    document_type: Mapped[
+        List["app.db.models.document_type.DocumentType"]
+    ] = relationship(
+        "app.db.models.document_type.DocumentType",
+        secondary=references_document_type_table,
+        lazy="joined",
     )
 
-    reference_events: Mapped[List["app.db.models.reference_event.ReferenceEvent"]] = (
-        relationship(
-            "app.db.models.reference_event.ReferenceEvent",
-            back_populates="reference",
-            cascade="all, delete",
-            lazy="raise",
-        )
+    reference_events: Mapped[
+        List["app.db.models.reference_event.ReferenceEvent"]
+    ] = relationship(
+        "app.db.models.reference_event.ReferenceEvent",
+        back_populates="reference",
+        cascade="all, delete",
+        lazy="raise",
     )
 
-    contributions: Mapped[List["app.db.models.contribution.Contribution"]] = (
-        relationship(
-            "app.db.models.contribution.Contribution",
-            back_populates="reference",
-            cascade="all, delete",
-            lazy="joined",
-        )
+    contributions: Mapped[
+        List["app.db.models.contribution.Contribution"]
+    ] = relationship(
+        "app.db.models.contribution.Contribution",
+        back_populates="reference",
+        cascade="all, delete",
+        lazy="joined",
     )
 
     issue_id: Mapped[int] = mapped_column(

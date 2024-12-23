@@ -207,20 +207,34 @@ class ScopusReferencesConverter(AbstractReferencesConverter):
         contributor_affiliation = {}
         contributions = []
         for author in authors:
-            afiliations = self._get_elements(author, "default:afid")
+            affiliations = self._get_elements(author, "default:afid")
             rank = author.attrib["seq"]
             identifier = self._get_element(author, "default:authid").text
             name = self._get_element(author, "default:authname").text
+            ext_identifiers = [
+                {
+                    "type": "scopus",
+                    "value": identifier,
+                }
+            ]
+            if (orcid := self._get_element(author, "default:orcid")) is not None:
+                ext_identifiers.append(
+                    {
+                        "type": "orcid",
+                        "value": orcid.text,
+                    }
+                )
             contributions.append(
                 AbstractReferencesConverter.ContributionInformations(
                     role=Contribution.get_url("AUT"),
                     identifier=identifier,
                     name=name,
                     rank=int(rank),
+                    ext_identifiers=ext_identifiers,
                 )
             )
             contributor_affiliation[identifier] = [
-                afiliation.text for afiliation in afiliations
+                affiliation.text for affiliation in affiliations
             ]
         return contributions, contributor_affiliation
 

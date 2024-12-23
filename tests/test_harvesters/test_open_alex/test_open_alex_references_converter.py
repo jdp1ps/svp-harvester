@@ -3,6 +3,8 @@ import datetime
 import pytest
 from semver import VersionInfo
 
+from app.db.daos.contributor_dao import ContributorDAO
+from app.db.session import async_session
 from app.harvesters.json_harvester_raw_result import JsonHarvesterRawResult
 from app.harvesters.open_alex.open_alex_references_converter import (
     OpenAlexReferencesConverter,
@@ -109,6 +111,31 @@ async def test_convert(open_alex_api_work: dict):
         == "https://pubmed.ncbi.nlm.nih.gov/9944570"
     )
     assert test_reference.manifestations[2].download_url == None
+
+    # take contribution of rank 3
+    contribution = next(c for c in test_reference.contributions if c.rank == 2)
+    contributor_id = contribution.contributor.id
+    assert contributor_id is not None
+    assert isinstance(contributor_id, int)
+    async with async_session() as session:
+        async with session.begin_nested():
+            contributor = await ContributorDAO(session).get_by_id(contributor_id)
+            assert contributor is not None
+            assert len(contributor.identifiers) == 2
+            assert any(
+                [
+                    identifier.type == "orcid"
+                    and identifier.value == "https://orcid.org/0000-0001-5576-2828"
+                    for identifier in contributor.identifiers
+                ]
+            )
+            assert any(
+                [
+                    identifier.type == "open_alex"
+                    and identifier.value == "https://openalex.org/A5019365851"
+                    for identifier in contributor.identifiers
+                ]
+            )
 
 
 @pytest.mark.asyncio
@@ -256,7 +283,7 @@ async def test_convert_work_with_hal_locations(
     When the converter is called
     Then the converter should infer Hal identifiers from HAL URLs
 
-    :param open_alex_work_with_various_locations:
+    :param open_alex_work_with_hal_locations:
     :return:
     """
     converter_under_tests = OpenAlexReferencesConverter()
