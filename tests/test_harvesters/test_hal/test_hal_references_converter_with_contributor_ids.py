@@ -62,7 +62,7 @@ async def test_convert(
             )
             assert any(
                 [
-                    identifier.type == "idhal" and identifier.value == "1288873"
+                    identifier.type == "idhal_i" and identifier.value == "1288873"
                     for identifier in contributor.identifiers
                 ]
             )

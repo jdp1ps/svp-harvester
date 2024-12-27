@@ -51,11 +51,19 @@ class HalTEIDecoder:
             id_type = idno.get("type")
             id_value = idno.text
             if id_type and id_value:
-                identifiers.append(
-                    {"type": self._normalize(id_type), "value": id_value}
-                )
+                identifier = self._process_identifier_data(id_type, id_value)
+                identifiers.append(identifier)
 
         return identifiers
+
+    def _process_identifier_data(self, id_type, id_value):
+        identifier = {"type": self._normalize(id_type), "value": id_value}
+        if id_type == "idhal":
+            if id_value.isnumeric():
+                identifier["type"] = "idhal_i"
+            else:
+                identifier["type"] = "idhal_s"
+        return identifier
 
     @staticmethod
     def _normalize(text: str) -> str:

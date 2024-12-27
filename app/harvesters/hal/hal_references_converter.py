@@ -320,11 +320,11 @@ class HalReferencesConverter(AbstractReferencesConverter):
                     f"Unexpected format for contributor {contributor}"
                 )
             name, ids, _ = contributor.split("_FacetSep_")
-            _, id_hal = ids.split("-")
+            form_id, id_hal = ids.split("-")
             contribution_informations.append(
                 AbstractReferencesConverter.ContributionInformations(
                     role=HalRolesConverter.convert(quality),
-                    identifier=id_hal if id_hal != "0" else None,
+                    identifier=id_hal if id_hal != "0" else form_id,
                     name=name,
                     rank=rank,
                     ext_identifiers=tei_decoder.get_identifiers(id_hal)

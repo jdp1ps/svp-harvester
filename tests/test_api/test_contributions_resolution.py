@@ -336,13 +336,13 @@ async def test_fetch_references_contributions_history(  # pylint: disable=too-ma
             _extract_contribution_by_rank(reference_5_v1_contributions, 0)[
                 "contributor"
             ]["source_identifier"]
-            is None
+            == "153764"
         )
         assert (
             _extract_contribution_by_rank(reference_5_v2_contributions, 0)[
                 "contributor"
             ]["source_identifier"]
-            is None
+            == "999999"
         )
 
 

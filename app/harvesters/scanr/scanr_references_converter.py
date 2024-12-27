@@ -46,7 +46,7 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
     CONTRIBUTORS_IDENTIFIERS_TYPE_MAPPING = {
         "idref": ContributorIdentifier.IdentifierType.IDREF.value,
         "orcid": ContributorIdentifier.IdentifierType.ORCID.value,
-        "id_hal": ContributorIdentifier.IdentifierType.IDHAL.value,
+        "id_hal": ContributorIdentifier.IdentifierType.IDHAL_S.value,
     }
 
     SOURCE_MAPPING = {
@@ -198,7 +198,9 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
                         role=contribution.get("role"),
                     ),
                     name=contribution.get("fullName"),
-                    identifier=contribution.get("person"),
+                    identifier=contribution.get(
+                        "person", contribution.get("toIdentify")
+                    ),
                     rank=rank,
                     ext_identifiers=self._convert_external_identifiers(raw_identifiers),
                 )

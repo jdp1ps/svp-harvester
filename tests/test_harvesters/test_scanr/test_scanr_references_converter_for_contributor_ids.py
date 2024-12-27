@@ -55,7 +55,8 @@ async def test_convert_publication_with_contributor_ids(
             )
             assert any(
                 [
-                    identifier.type == "idhal" and identifier.value == "valentine-roux"
+                    identifier.type == "idhal_s"
+                    and identifier.value == "valentine-roux"
                     for identifier in contributor.identifiers
                 ]
             )

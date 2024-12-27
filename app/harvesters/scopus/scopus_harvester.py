@@ -23,7 +23,7 @@ class ScopusHarvester(AbstractHarvester):
 
     supported_identifier_types = ["scopus_eid"]
 
-    VERSION: Version = VersionInfo.parse("1.2.0")
+    VERSION: Version = VersionInfo.parse("1.4.0")
 
     async def _get_scopus_query_parameters(self, entity_class: str):
         """

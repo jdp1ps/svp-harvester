@@ -1,9 +1,7 @@
 import pytest
 from semver import VersionInfo
 
-from app.harvesters.exceptions.unexpected_format_exception import (
-    UnexpectedFormatException,
-)
+
 from app.harvesters.json_harvester_raw_result import JsonHarvesterRawResult
 from app.harvesters.scanr.scanr_references_converter import ScanrReferencesConverter
 
@@ -24,10 +22,6 @@ def fixture_scanr_publication_doc_with_journal_with_title(
     return scanr_publication_doc_with_journal_with_title["hits"]["hits"]
 
 
-import pytest
-
-
-@pytest.mark.current
 async def test_convert_publication_with_journal_without_title(
     scanr_publication_doc_with_journal_without_title,
 ):

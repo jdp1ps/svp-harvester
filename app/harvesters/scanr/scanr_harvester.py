@@ -27,7 +27,7 @@ class ScanrHarvester(AbstractHarvester):
 
     supported_identifier_types = ["idref", "orcid", "id_hal_s"]
 
-    VERSION: Version = VersionInfo.parse("1.2.0")
+    VERSION: Version = VersionInfo.parse("1.4.0")
 
     async def _get_scanr_query_parameters(self, entity_class: str):
         """
@@ -40,9 +40,8 @@ class ScanrHarvester(AbstractHarvester):
         # and choose the first one for which value is provided
 
         for scanr_query_parameter, identifier_key in query_parameters:
-
             assert (
-                    identifier_key in self.supported_identifier_types
+                identifier_key in self.supported_identifier_types
             ), "Unable to run Scanr harvester for a person without idref, orcid or id_hal_s"
 
             identifier_value = entity.get_identifier(identifier_key)
