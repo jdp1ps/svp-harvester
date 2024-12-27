@@ -1,9 +1,7 @@
 import pytest
 from semver import VersionInfo
 
-from app.harvesters.exceptions.unexpected_format_exception import (
-    UnexpectedFormatException,
-)
+
 from app.harvesters.json_harvester_raw_result import JsonHarvesterRawResult
 from app.harvesters.scanr.scanr_references_converter import ScanrReferencesConverter
 
