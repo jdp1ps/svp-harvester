@@ -65,6 +65,8 @@ class AbstractReferencesConverter(ABC):
         role: str | None = Contribution.get_url("UNKNOWN")
         rank: int | None = None
         name: str | None = None
+        first_name: str | None = None
+        last_name: str | None = None
         identifier: str | None = None
         ext_identifiers: List[dict[str, str]] = None
 

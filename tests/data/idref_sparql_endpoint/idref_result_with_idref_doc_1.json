@@ -1,21 +1,16 @@
 {
   "uri": "http://www.idref.fr/215634608/id",
   "role": "http://id.loc.gov/vocabulary/relators/aut",
-  "contributor": [
-    "http://www.idref.fr/026675846/id"
-  ],
-  "contributorName": [
-    "Abatut, Jean-Louis"
-  ],
-  "contributorFamilyName": [
-    "Abatut"
-  ],
-  "contributorGivenName": [
-    "Jean-Louis"
-  ],
-  "contributorRole": [
-    "http://id.loc.gov/vocabulary/relators/aut"
-  ],
+  "contributors": {
+    "http://www.idref.fr/026675846/id": {
+      "familyName": "Abatut",
+      "givenName": "Jean-Louis",
+      "name": "Jean-Louis Abatut",
+      "roles": [
+        "http://id.loc.gov/vocabulary/relators/aut"
+      ]
+    }
+  },
   "title": [
     "Insonorisation d'un système de climatisation automobile par contrôle actif du bruit"
   ],

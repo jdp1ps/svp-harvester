@@ -60,15 +60,15 @@ class IdrefSparqlClient:
     @execution_timer
     async def fetch_publications(self, query: str) -> AsyncGenerator[dict, None]:
         """
-        Fetch publications list for a given author from the Idref sparql endpoint
+        Fetch publications list for a given author from the Idref sparql endpoint.
 
-        :param query:  the sparql query to send to the Idref sparql endpoint
-        :return: A generator of results
+        :param query: The sparql query to send to the Idref sparql endpoint.
+        :return: A generator of results.
         """
         client: SPARQLClient = self._get_client()
         try:
             response = await client.query(query)
-            # aggregate results
+            # Aggregate results
             publications = {}
             for result in response.get("results", {}).get("bindings", []):
                 if not any(
@@ -77,16 +77,12 @@ class IdrefSparqlClient:
                 ):
                     continue
                 pub = result.get("pub", {}).get("value", "")
-                # create a new publication if it does not exist
+                # Create a new publication if it does not exist
                 if pub not in publications:
                     publications[pub] = {
                         "uri": pub,
                         "role": result.get("role", {}).get("value", ""),
-                        "contributor": [],
-                        "contributorRole": [],
-                        "contributorName": [],
-                        "contributorFamilyName": [],
-                        "contributorGivenName": [],
+                        "contributors": {},  # Use a dictionary for contributors
                         "title": [],
                         "note": [],
                         "type": [],
@@ -95,19 +91,35 @@ class IdrefSparqlClient:
                         "equivalent": [],
                         "doi": result.get("doi", {}).get("value", ""),
                     }
-                # add the data to the publication
-                for key in [
-                    "type",
-                    "title",
-                    "altLabel",
-                    "note",
-                    "contributor",
-                    "contributorRole",
-                    "contributorName",
-                    "contributorFamilyName",
-                    "contributorGivenName",
-                    "equivalent",
-                ]:
+                # Add or update the contributor data
+                contributor_uri = result.get("contributor", {}).get("value", "")
+                if contributor_uri:
+                    if contributor_uri not in publications[pub]["contributors"]:
+                        publications[pub]["contributors"][contributor_uri] = {
+                            "name": result.get("contributorName", {}).get("value", ""),
+                            "familyName": result.get("contributorFamilyName", {}).get(
+                                "value", ""
+                            ),
+                            "givenName": result.get("contributorGivenName", {}).get(
+                                "value", ""
+                            ),
+                            "roles": [],  # Initialize roles as a list
+                        }
+                    # Add the role to the contributor if not already present
+                    role = result.get("contributorRole", {}).get("value", "")
+                    if (
+                        role
+                        and role
+                        not in publications[pub]["contributors"][contributor_uri][
+                            "roles"
+                        ]
+                    ):
+                        publications[pub]["contributors"][contributor_uri][
+                            "roles"
+                        ].append(role)
+
+                # Add other data to the publication
+                for key in ["type", "title", "altLabel", "note", "equivalent"]:
                     if (
                         result.get(key, {}).get("value", "")
                         not in publications[pub][key]
@@ -179,19 +191,23 @@ class IdrefSparqlClient:
             concept_raw_data: dict = response.get("results", {}).get("bindings", [])
             dict_to_return = {}
 
-            if any('prefLabel' in entry for entry in concept_raw_data):
+            if any("prefLabel" in entry for entry in concept_raw_data):
                 unique_pref_labels = {
-                    tuple(label.items()) for label in
-                    (entry.get("prefLabel") for entry in concept_raw_data)
+                    tuple(label.items())
+                    for label in (entry.get("prefLabel") for entry in concept_raw_data)
                 }
-                dict_to_return["pref_labels"] = [dict(label) for label in unique_pref_labels]
+                dict_to_return["pref_labels"] = [
+                    dict(label) for label in unique_pref_labels
+                ]
 
-            if any('altLabel' in entry for entry in concept_raw_data):
+            if any("altLabel" in entry for entry in concept_raw_data):
                 unique_alt_labels = {
-                    tuple(label.items()) for label in
-                    (entry.get("altLabel") for entry in concept_raw_data)
+                    tuple(label.items())
+                    for label in (entry.get("altLabel") for entry in concept_raw_data)
                 }
-                dict_to_return["alt_labels"]  = [dict(label) for label in unique_alt_labels]
+                dict_to_return["alt_labels"] = [
+                    dict(label) for label in unique_alt_labels
+                ]
 
             return dict_to_return
         except Exception as error:

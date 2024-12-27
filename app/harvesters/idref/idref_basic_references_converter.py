@@ -81,46 +81,57 @@ class IdrefBasicReferencesConverter(AbstractReferencesConverter):
         """
         Retrieves contributor information from the given dictionary payload.
 
-        :params dict_payload: The dictionary payload containing author and role information.
+        :params dict_payload: The dictionary payload containing contributor and role information.
 
         :return: A list of ContributionInformations objects.
         """
         contributor_informations = []
-        for (
-            contributor,
-            contributor_role,
-            contributor_name,
-            contributor_family_name,
-            contributor_given_name,
-        ) in zip(
-            dict_payload.get("contributor", []),
-            dict_payload.get("contributorRole", []),
-            dict_payload.get("contributorName", []),
-            dict_payload.get("contributorFamilyName", []),
-            dict_payload.get("contributorGivenName", []),
-        ):
-            if contributor == "":
+        contributors = dict_payload.get("contributors", {})
+
+        for contributor_uri, contributor_data in contributors.items():
+            if not contributor_uri:
                 continue
-            contributor_url = contributor.replace("/id", ".rdf")
-            contributor_url = contributor_url.replace("http://", "https://")
-            graph = await RdfResolver().fetch(contributor_url)
-            for name in graph.objects(URIRef(contributor), FOAF.familyName):
-                contributor_family_name = name.value
-            for name in graph.objects(URIRef(contributor), FOAF.givenName):
-                contributor_given_name = name.value
-            if contributor_family_name and contributor_given_name:
-                contributor_name = f"{contributor_given_name} {contributor_family_name}"
-            else:
-                for name in graph.objects(URIRef(contributor), FOAF.name):
-                    contributor_name = name.value
-            role = contributor_role.split("/")[-1]
-            contributor_informations.append(
-                AbstractReferencesConverter.ContributionInformations(
-                    role=IdrefRolesConverter.convert(role),
-                    identifier=contributor,
-                    name=contributor_name,
-                    rank=None,
-                )
+
+            contributor_url = contributor_uri.replace("/id", ".rdf").replace(
+                "http://", "https://"
             )
+            graph = await RdfResolver().fetch(contributor_url)
+
+            # Extract family name and given name from RDF if available
+            family_name = contributor_data.get("familyName", "")
+            given_name = contributor_data.get("givenName", "")
+            name = contributor_data.get("name", "")
+
+            # Update family and given names using RDF if available
+            for rdf_family_name in graph.objects(
+                URIRef(contributor_uri), FOAF.familyName
+            ):
+                family_name = rdf_family_name.value
+            for rdf_given_name in graph.objects(
+                URIRef(contributor_uri), FOAF.givenName
+            ):
+                given_name = rdf_given_name.value
+
+            # Fallback to RDF full name if specific parts are missing
+            if not family_name or not given_name:
+                for rdf_name in graph.objects(URIRef(contributor_uri), FOAF.name):
+                    name = rdf_name.value
+            else:
+                name = f"{given_name} {family_name}"
+
+            # Handle multiple roles for the contributor
+            roles = contributor_data.get("roles", [])
+            for role_uri in roles:
+                role = role_uri.split("/")[-1]
+                contributor_informations.append(
+                    AbstractReferencesConverter.ContributionInformations(
+                        role=IdrefRolesConverter.convert(role),
+                        identifier=contributor_uri,
+                        name=name,
+                        first_name=given_name,
+                        last_name=family_name,
+                        rank=None,
+                    )
+                )
 
         return contributor_informations
