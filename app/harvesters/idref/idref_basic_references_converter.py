@@ -92,46 +92,67 @@ class IdrefBasicReferencesConverter(AbstractReferencesConverter):
             if not contributor_uri:
                 continue
 
-            contributor_url = contributor_uri.replace("/id", ".rdf").replace(
-                "http://", "https://"
+            name, family_name, given_name = await self._fetch_and_update_names(
+                contributor_uri, contributor_data
             )
-            graph = await RdfResolver().fetch(contributor_url)
 
-            # Extract family name and given name from RDF if available
-            family_name = contributor_data.get("familyName", "")
-            given_name = contributor_data.get("givenName", "")
-            name = contributor_data.get("name", "")
-
-            # Update family and given names using RDF if available
-            for rdf_family_name in graph.objects(
-                URIRef(contributor_uri), FOAF.familyName
-            ):
-                family_name = rdf_family_name.value
-            for rdf_given_name in graph.objects(
-                URIRef(contributor_uri), FOAF.givenName
-            ):
-                given_name = rdf_given_name.value
-
-            # Fallback to RDF full name if specific parts are missing
-            if not family_name or not given_name:
-                for rdf_name in graph.objects(URIRef(contributor_uri), FOAF.name):
-                    name = rdf_name.value
-            else:
-                name = f"{given_name} {family_name}"
-
-            # Handle multiple roles for the contributor
             roles = contributor_data.get("roles", [])
-            for role_uri in roles:
-                role = role_uri.split("/")[-1]
-                contributor_informations.append(
-                    AbstractReferencesConverter.ContributionInformations(
-                        role=IdrefRolesConverter.convert(role),
-                        identifier=contributor_uri,
-                        name=name,
-                        first_name=given_name,
-                        last_name=family_name,
-                        rank=None,
-                    )
-                )
+            contributor_informations.extend(
+                self._create_contribution_information(contributor_uri, name, roles)
+            )
 
         return contributor_informations
+
+    async def _fetch_and_update_names(self, contributor_uri, contributor_data):
+        """
+        Fetches and updates contributor names using RDF data.
+
+        :param contributor_uri: The URI of the contributor.
+        :param contributor_data: The dictionary containing initial contributor data.
+
+        :return: A tuple of (name, family_name, given_name).
+        """
+        contributor_url = contributor_uri.replace("/id", ".rdf").replace(
+            "http://", "https://"
+        )
+        graph = await RdfResolver().fetch(contributor_url)
+
+        family_name = contributor_data.get("familyName", "")
+        given_name = contributor_data.get("givenName", "")
+        name = contributor_data.get("name", "")
+
+        for rdf_family_name in graph.objects(URIRef(contributor_uri), FOAF.familyName):
+            family_name = rdf_family_name.value
+        for rdf_given_name in graph.objects(URIRef(contributor_uri), FOAF.givenName):
+            given_name = rdf_given_name.value
+
+        if not family_name or not given_name:
+            for rdf_name in graph.objects(URIRef(contributor_uri), FOAF.name):
+                name = rdf_name.value
+        else:
+            name = f"{given_name} {family_name}"
+
+        return name, family_name, given_name
+
+    def _create_contribution_information(self, contributor_uri, name, roles):
+        """
+        Creates ContributionInformations objects for each role.
+
+        :param contributor_uri: The URI of the contributor.
+        :param name: The full name of the contributor.
+        :param roles: A list of roles associated with the contributor.
+
+        :return: A list of ContributionInformations objects.
+        """
+        contribution_informations = []
+        for role_uri in roles:
+            role = role_uri.split("/")[-1]
+            contribution_informations.append(
+                AbstractReferencesConverter.ContributionInformations(
+                    role=IdrefRolesConverter.convert(role),
+                    identifier=contributor_uri,
+                    name=name,
+                    rank=None,
+                )
+            )
+        return contribution_informations
