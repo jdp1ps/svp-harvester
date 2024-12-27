@@ -98,7 +98,9 @@ class IdrefBasicReferencesConverter(AbstractReferencesConverter):
 
             roles = contributor_data.get("roles", [])
             contributor_informations.extend(
-                self._create_contribution_information(contributor_uri, name, roles)
+                self._create_contribution_information(
+                    contributor_uri, name, family_name, given_name, roles
+                )
             )
 
         return contributor_informations
@@ -134,7 +136,10 @@ class IdrefBasicReferencesConverter(AbstractReferencesConverter):
 
         return name, family_name, given_name
 
-    def _create_contribution_information(self, contributor_uri, name, roles):
+    @staticmethod
+    def _create_contribution_information(
+        contributor_uri, name, family_name, given_name, roles
+    ):
         """
         Creates ContributionInformations objects for each role.
 
@@ -152,6 +157,8 @@ class IdrefBasicReferencesConverter(AbstractReferencesConverter):
                     role=IdrefRolesConverter.convert(role),
                     identifier=contributor_uri,
                     name=name,
+                    last_name=family_name,
+                    first_name=given_name,
                     rank=None,
                 )
             )
