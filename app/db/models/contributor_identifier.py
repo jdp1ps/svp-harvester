@@ -16,7 +16,8 @@ class ContributorIdentifier(Base):
 
         ORCID = "orcid"
         OPEN_ALEX = "open_alex"
-        IDHAL = "idhal"
+        IDHAL_I = "idhal_i"
+        IDHAL_S = "idhal_s"
         IDREF = "idref"
         SCOPUS = "scopus"
         GOOGLE_SCHOLAR = "google_scholar"
