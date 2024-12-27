@@ -185,11 +185,10 @@ class OpenAlexReferencesConverter(AbstractReferencesConverter):
     ) -> AsyncGenerator[ReferenceIdentifier, None]:
         try:
             for id_key in json_payload["ids"]:
-                if id_key == "openalex":
-                    id_key = "open_alex"
+                key = "open_alex" if id_key == "openalex" else id_key
                 if id_key not in self.REFERENCE_IDENTIFIERS_IGNORE:
                     yield ReferenceIdentifier(
-                        type=id_key, value=json_payload["ids"][id_key]
+                        type=key, value=json_payload["ids"][id_key]
                     )
         except KeyError:
             yield
