@@ -239,38 +239,40 @@ class SudocReferencesConverter(AbesRDFReferencesConverter):
         for raw_uri in pub_graph.subjects(predicate=None, object=URIRef(uri)):
             new_ref.manifestations.append(ReferenceManifestation(page=str(raw_uri)))
         nnt_found = False
-        for theses_fr_uri in pub_graph.objects(
-            rdflib.term.URIRef(uri), self.RDF_BIBO.uri
-        ):
-            # the uri finishing by /document redirects to hal.science
-            if not theses_fr_uri.value.endswith("/document"):
+        for uri1 in pub_graph.objects(rdflib.term.URIRef(uri), self.RDF_BIBO.uri):
+            # uri finishing by /document redirects to hal.science
+            if not uri1.value.endswith("/document"):
                 try:
                     new_ref.manifestations.append(
-                        ReferenceManifestation(page=theses_fr_uri.value)
+                        ReferenceManifestation(page=uri1.value)
                     )
                 except ValueError as e:
                     logger.error(
                         "Unable to register theses.fr URI  for SUDOC "
-                        f"URI {uri} : {theses_fr_uri.value} {e}"
+                        f"URI {uri} : {uri1.value} {e}"
                     )
             if not nnt_found:
-                nnt = re.search(
-                    r"^https?://www.theses.fr/([^/]+)/.+", theses_fr_uri.value
-                )
-                if nnt:
-                    new_ref.identifiers.append(
-                        ReferenceIdentifier(value=nnt.groups()[0], type="nnt")
-                    )
-                    nnt_found = True
+                nnt_found = self._extract_nnt(new_ref, uri1.value)
 
         # take rdam:P30135 as another manifestation
-        for uri1 in pub_graph.objects(rdflib.term.URIRef(uri), self.RDAM.P30135):
+        for uri2 in pub_graph.objects(rdflib.term.URIRef(uri), self.RDAM.P30135):
             try:
-                new_ref.manifestations.append(ReferenceManifestation(page=str(uri1)))
+                new_ref.manifestations.append(ReferenceManifestation(page=str(uri2)))
             except ValueError as e:
                 logger.error(
-                    f"Unable to register alternative URI: {uri1} for SUDOC URI {uri} : {e}"
+                    f"Unable to register alternative URI: {uri2} for SUDOC URI {uri} : {e}"
                 )
+            if not nnt_found:
+                nnt_found = self._extract_nnt(new_ref, str(uri2))
+
+    def _extract_nnt(self, new_ref: Reference, uri: str) -> bool:
+        nnt = re.search(r"^https?://www.theses.fr/([^/]+)/.+", uri)
+        if nnt:
+            new_ref.identifiers.append(
+                ReferenceIdentifier(value=nnt.groups()[0], type="nnt")
+            )
+            return True
+        return False
 
     def _get_source(self):
         return "sudoc"

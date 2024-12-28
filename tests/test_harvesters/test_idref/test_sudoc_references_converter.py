@@ -198,3 +198,30 @@ async def test_convert_thesis_with(sudoc_rdf_result_for_thesis):
         identifier.type == "nnt" and identifier.value == "2020UPAST005"
         for identifier in test_reference.identifiers
     )
+
+
+async def test_nnt_fount_in_manifestation_uri(
+    sudoc_rdf_result_for_thesis_with_nnt_in_manifestation_uri,
+):
+    """
+    GIVEN a Sudoc RDF result for a thesis with an NNT in the manifestation URI
+    WHEN the reference is converted
+    THEN it should return a Reference instance with the NNT as an identifier
+
+    :param sudoc_rdf_result_for_thesis_with_nnt_in_manifestation_uri:
+    :return:
+    """
+    converter_under_tests = SudocReferencesConverter()
+    test_reference = converter_under_tests.build(
+        raw_data=sudoc_rdf_result_for_thesis_with_nnt_in_manifestation_uri,
+        harvester_version=VersionInfo.parse("0.0.0"),
+    )
+    await converter_under_tests.convert(
+        raw_data=sudoc_rdf_result_for_thesis_with_nnt_in_manifestation_uri,
+        new_ref=test_reference,
+    )
+    # there should be an identifier of type nnt with value 2020UPAST005
+    assert any(
+        identifier.type == "nnt" and identifier.value == "2020UPAST005"
+        for identifier in test_reference.identifiers
+    )
