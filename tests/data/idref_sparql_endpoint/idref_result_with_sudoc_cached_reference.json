@@ -25,6 +25,10 @@
           "type": "uri",
           "value": "http://id.loc.gov/vocabulary/relators/pbd"
         },
+        "date": {
+          "type": "literal",
+          "value": "1999"
+        },
         "type": {
           "type": "uri",
           "value": "http://purl.org/ontology/bibo/Book"

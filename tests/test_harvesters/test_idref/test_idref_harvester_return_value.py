@@ -1,3 +1,4 @@
+import datetime
 from unittest import mock
 
 import aiosparql.client

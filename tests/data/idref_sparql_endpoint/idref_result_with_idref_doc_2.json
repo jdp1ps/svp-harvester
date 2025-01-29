@@ -1,6 +1,7 @@
 {
   "uri": "http://www.idref.fr/215634608/id",
   "role": "http://id.loc.gov/vocabulary/relators/aut",
+  "date": "1997",
   "author": ["http://www.idref.fr/026675846/id"],
   "title": [
     "Insonorisation d'un système de climatisation automobile par contrôle actif du bruit"
