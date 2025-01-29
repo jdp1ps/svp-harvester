@@ -18,10 +18,10 @@ def fixture_fake_rdf_resolver_fixture():
 
 
 @pytest.fixture(name="resolver_http_client_mock")
-def fixture_resolver_http_client_mock(sudoc_rdf_xml_with_empty_date_fields: str):
+def fixture_resolver_http_client_mock(sudoc_rdf_xml_with_date_fields: str):
     """RDF resolver mock to detect fetch method calls."""
     with mock.patch.object(ResolverHTTPClient, "get") as mock_solve:
-        mock_solve.return_value = sudoc_rdf_xml_with_empty_date_fields
+        mock_solve.return_value = sudoc_rdf_xml_with_date_fields
         yield mock_solve
 
 
@@ -33,7 +33,7 @@ def fixture_resolver_http_client_mock_with_empty_response():
         yield mock_solve
 
 
-async def test_fetch(resolver_http_client_mock):
+async def test_fetch(resolver_http_client_mock):  # pylint: disable=unused-argument
     """
     GIVEN a RdfResolver instance and a Sudoc RDF XML with an empty dcterms:date and an empty dc:date
     WHEN the fetch method is called
@@ -67,7 +67,9 @@ async def test_fetch(resolver_http_client_mock):
     ), "Found triples with empty dcterms:date values"
 
 
-async def test_fetch_with_empty_response(resolver_http_client_mock_with_empty_response):
+async def test_fetch_with_empty_response(
+    resolver_http_client_mock_with_empty_response,  # pylint: disable=unused-argument
+):
     """
     GIVEN a RdfResolver instance and an empty response from the RDF resolver
     WHEN the fetch method is called
