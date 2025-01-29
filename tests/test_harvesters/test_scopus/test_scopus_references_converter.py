@@ -45,6 +45,12 @@ async def test_convert(scopus_xml_raw_result_for_doc: XMLHarvesterRawResult):
         "Eisele-Metzger A.",
         "Dieterich A.V.",
     ]
+    expected_last_name_first_name_tuples = [
+        ("Haueise", "Andreas"),
+        ("Le Sant", "Guillaume"),
+        ("Eisele-Metzger", "Angelika"),
+        ("Dieterich", "Angela V."),
+    ]
     expected_affiliation = ["Hochschule Furtwangen", "CHU de Nantes"]
 
     expected_page = "132-134"
@@ -66,6 +72,10 @@ async def test_convert(scopus_xml_raw_result_for_doc: XMLHarvesterRawResult):
             assert label.value in expected_concepts
     for contribution in test_reference.contributions:
         assert contribution.contributor.name in expected_authors
+        assert (
+            contribution.contributor.last_name,
+            contribution.contributor.first_name,
+        ) in expected_last_name_first_name_tuples
         assert contribution.role == expected_role
         for affiliation in contribution.affiliations:
             assert affiliation.name in expected_affiliation
