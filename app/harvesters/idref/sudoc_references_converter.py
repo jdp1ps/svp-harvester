@@ -200,9 +200,11 @@ class SudocReferencesConverter(AbesRDFReferencesConverter):
         # we fecth the cd:date field if present : it may occur multiple times and the date is
         # often limited to the year
         for issued in pub_graph.objects(rdflib.term.URIRef(uri), DC.date):
-            date_string = issued.value
+            # date is in the form of "yyyy"
+            year_date_string = issued.value
             try:
-                new_ref.issued = check_valid_iso8601_date(date_string)
+                # isodate will convert it to "yyyy-01-01"
+                new_ref.issued = check_valid_iso8601_date(year_date_string)
             except UnexpectedFormatException as error:
                 logger.error(
                     f"Sudoc reference converter cannot create issued date from"
