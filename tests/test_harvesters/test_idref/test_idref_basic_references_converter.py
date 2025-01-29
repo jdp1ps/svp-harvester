@@ -52,8 +52,10 @@ async def test_idref_convert_for_sparql_result(idref_sparql_result_for_doc):
     )
 
     expected_abstract_language = "fr"
-    expected_title = ("Insonorisation d'un système de climatisation automobile "
-                      "par contrôle actif du bruit")
+    expected_title = (
+        "Insonorisation d'un système de climatisation automobile "
+        "par contrôle actif du bruit"
+    )
     expected_document_type = "Work"
     expected_auth_name = "Jean-Louis Abatut"
     expected_auth_first_name = "Jean-Louis"
