@@ -300,21 +300,39 @@ class HalReferencesConverter(AbstractReferencesConverter):
     async def _add_contributions(
         self, raw_data: dict, new_ref: Reference, tei_decoder: HalTEIDecoder = None
     ) -> None:
-        if len(raw_data.get("authQuality_s", [])) != len(
+        # pylint: disable=too-many-locals
+        number_of_contributors = len(
             raw_data.get("authFullNameFormIDPersonIDIDHal_fs", [])
-        ):
+        )
+        if len(raw_data.get("authQuality_s", [])) != number_of_contributors:
             raise UnexpectedFormatException(
                 "Number of qualities and contributors "
                 f"is not the same for halId_s: {raw_data['halId_s']}"
             )
         contribution_informations = []
+        first_names = raw_data.get("authFirstName_s", [])
+        last_names = raw_data.get("authLastName_s", [])
+        # if first_names or last_names length is not the same as the number of contributors
+        # discard first names and last names, replace it with list of None of the same length
+        if (
+            len(first_names) != len(last_names)
+            or len(first_names) != number_of_contributors
+        ):
+            first_names = [None] * number_of_contributors
+            last_names = [None] * number_of_contributors
+            logger.warning(
+                "First names and last names are not the same length as "
+                f"contributors for halId_s: {raw_data['halId_s']}"
+            )
         for rank, contribution in enumerate(
             zip(
                 raw_data.get("authQuality_s", []),
                 raw_data.get("authFullNameFormIDPersonIDIDHal_fs", []),
+                first_names,
+                last_names,
             )
         ):
-            quality, contributor = contribution
+            quality, contributor, first_name, last_name = contribution
             if not re.match(r".*_FacetSep_.*-.*_FacetSep_", contributor):
                 raise UnexpectedFormatException(
                     f"Unexpected format for contributor {contributor}"
@@ -326,6 +344,8 @@ class HalReferencesConverter(AbstractReferencesConverter):
                     role=HalRolesConverter.convert(quality),
                     identifier=id_hal if id_hal != "0" else form_id,
                     name=name,
+                    first_name=first_name,
+                    last_name=last_name,
                     rank=rank,
                     ext_identifiers=tei_decoder.get_identifiers(id_hal)
                     if tei_decoder
@@ -380,6 +400,8 @@ class HalReferencesConverter(AbstractReferencesConverter):
             HashKey("en_abstract_s"),
             HashKey("authIdForm_i"),
             HashKey("authFullNameFormIDPersonIDIDHal_fs"),
+            HashKey("authFirstName_s"),
+            HashKey("authLastName_s"),
             HashKey("authIdHasStructure_fs"),
             HashKey("labStructId_i"),
             HashKey("docType_s"),

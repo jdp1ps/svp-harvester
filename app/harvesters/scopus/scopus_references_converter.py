@@ -50,7 +50,6 @@ class ScopusReferencesConverter(AbstractReferencesConverter):
         async for title in self._title(entry):
             new_ref.titles.append(title)
 
-        abstract = self._abstract(entry)
         async for abstract in self._abstract(entry):
             new_ref.abstracts.append(abstract)
 
@@ -211,6 +210,8 @@ class ScopusReferencesConverter(AbstractReferencesConverter):
             rank = author.attrib["seq"]
             identifier = self._get_element(author, "default:authid").text
             name = self._get_element(author, "default:authname").text
+            first_name = self._get_element(author, "default:given-name").text
+            last_name = self._get_element(author, "default:surname").text
             ext_identifiers = [
                 {
                     "type": "scopus",
@@ -229,6 +230,8 @@ class ScopusReferencesConverter(AbstractReferencesConverter):
                     role=Contribution.get_url("AUT"),
                     identifier=identifier,
                     name=name,
+                    first_name=first_name,
+                    last_name=last_name,
                     rank=int(rank),
                     ext_identifiers=ext_identifiers,
                 )

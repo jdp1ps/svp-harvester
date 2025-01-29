@@ -277,6 +277,22 @@ async def test_fetch_references_contributions_history(  # pylint: disable=too-ma
                 "contributor"
             ]["name_variants"]
         )
+        previous_first_name = _extract_contribution_by_rank(
+            reference_3_v1_contributions, 1
+        )["contributor"]["first_name"]
+
+        previous_last_name = _extract_contribution_by_rank(
+            reference_3_v1_contributions, 1
+        )["contributor"]["last_name"]
+        assert any(
+            [
+                variant["first_name"] == previous_first_name
+                and variant["last_name"] == previous_last_name
+                for variant in _extract_contribution_by_rank(
+                    reference_3_v2_contributions, 1
+                )["contributor"]["structured_name_variants"]
+            ]
+        )
         reference_4_v2_id = _extract_reference_id_by_source_identifier(
             events, "4-will-have-a-contributor-keeping-his-name-but-changing-his-id"
         )

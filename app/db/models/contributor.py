@@ -1,13 +1,10 @@
 from typing import List
 
 from sqlalchemy import String, Index
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
-from app.db.models.contributor_identifier import (  # pylint: disable=unused-import
-    ContributorIdentifier,
-)
 
 
 class Contributor(Base):
@@ -21,6 +18,8 @@ class Contributor(Base):
     source: Mapped[str] = mapped_column(nullable=False, index=True)
     source_identifier: Mapped[str] = mapped_column(nullable=True, index=True)
     name: Mapped[str] = mapped_column(nullable=False, index=True)
+    first_name: Mapped[str] = mapped_column(nullable=True)
+    last_name: Mapped[str] = mapped_column(nullable=True)
 
     contributions: Mapped[
         List["app.db.models.contribution.Contribution"]
@@ -40,9 +39,11 @@ class Contributor(Base):
         lazy="joined",
     )
 
-    # use postgresql array type
     name_variants: Mapped[List[str]] = mapped_column(
         ARRAY(String), nullable=False, default=[]
+    )
+    structured_name_variants: Mapped[List[dict]] = mapped_column(
+        JSONB, nullable=False, default=[]
     )
 
     # partial unique index on source and name when source_identifier is null

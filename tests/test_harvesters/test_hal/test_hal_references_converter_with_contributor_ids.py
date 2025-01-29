@@ -37,6 +37,9 @@ async def test_convert(
         async with session.begin_nested():
             contributor = await ContributorDAO(session).get_by_id(contributor_id)
             assert contributor is not None
+            assert contributor.name == "Vincent Bichet"
+            assert contributor.first_name == "Vincent"
+            assert contributor.last_name == "Bichet"
             assert len(contributor.identifiers) == 6
             assert any(
                 [

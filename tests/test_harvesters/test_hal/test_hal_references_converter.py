@@ -20,6 +20,15 @@ def fixture_hal_api_response_with_uris(hal_api_docs_for_researcher_with_uris):
     return hal_api_docs_for_researcher_with_uris["response"]["docs"]
 
 
+# for hal_api_docs_with_inconsistent_structured_names
+@pytest.fixture(name="hal_api_docs_with_inconsistent_structured_names")
+def fixture_hal_api_response_with_inconsistent_structured_names(
+    hal_api_docs_with_inconsistent_structured_names,
+):
+    """Return the list of dictionaries references from hal response"""
+    return hal_api_docs_with_inconsistent_structured_names["response"]["docs"]
+
+
 async def test_convert(hal_api_cleaned_response):  # pylint: disable=too-many-locals
     """Test that the converter will return normalised references"""
     converter_under_tests = HalReferencesConverter()
@@ -41,6 +50,8 @@ async def test_convert(hal_api_cleaned_response):  # pylint: disable=too-many-lo
     expected_contributors_number = 1
     expected_contributor_role = Contribution.get_url("AUT")
     expected_contributor_name = "Violaine Sebillotte Cuchet"
+    expected_contributor_first_name = "Violaine"
+    expected_contributor_last_name = "Sebillotte Cuchet"
     expected_contributor_source = "hal"
     expected_contributor_source_identifier = "10227"
     expected_references_identifier_types = ["hal", "doi"]
@@ -79,6 +90,14 @@ async def test_convert(hal_api_cleaned_response):  # pylint: disable=too-many-lo
             == expected_contributor_name
         )
         assert (
+            test_reference.contributions[0].contributor.first_name
+            == expected_contributor_first_name
+        )
+        assert (
+            test_reference.contributions[0].contributor.last_name
+            == expected_contributor_last_name
+        )
+        assert (
             test_reference.contributions[0].contributor.source
             == expected_contributor_source
         )
@@ -93,6 +112,34 @@ async def test_convert(hal_api_cleaned_response):  # pylint: disable=too-many-lo
                 identifier.type == type_ and identifier.value == value
                 for identifier in test_reference.identifiers
             )
+
+
+async def test_convert_response_with_inconsistent_structured_names(
+    hal_api_docs_with_inconsistent_structured_names, caplog
+):
+    """
+    Test that the converter will raise an exception when the number of names in structuredNames
+     does not match the number of contributors
+    """
+    converter_under_tests = HalReferencesConverter()
+    for doc in hal_api_docs_with_inconsistent_structured_names:
+        result = JsonHarvesterRawResult(
+            source_identifier=doc["docid"], payload=doc, formatter_name="HAL"
+        )
+        reference = converter_under_tests.build(
+            raw_data=result, harvester_version=VersionInfo.parse("0.0.0")
+        )
+        await converter_under_tests.convert(raw_data=result, new_ref=reference)
+        # the contributors should have None as first name/last name but should have names
+        assert reference.contributions[0].contributor.name == "Vincent Bichet"
+        for contribution in reference.contributions:
+            assert contribution.contributor.first_name is None
+            assert contribution.contributor.last_name is None
+            assert contribution.contributor.name is not None
+        assert (
+            "First names and last names are not the same length as contributors"
+            in caplog.text
+        )
 
 
 @pytest.mark.parametrize(

@@ -86,6 +86,8 @@ class AbstractReferencesConverter(ABC):
         for contribution_information in contribution_informations:
             identifier = contribution_information.identifier
             name = contribution_information.name
+            first_name = contribution_information.first_name
+            last_name = contribution_information.last_name
             ext_identifiers = contribution_information.ext_identifiers
             assert (
                 identifier is not None or name is not None
@@ -98,10 +100,17 @@ class AbstractReferencesConverter(ABC):
                 if identifier is not None:
                     db_contributor = (
                         await self._get_or_create_contributor_by_identifier(
-                            source=source, source_identifier=identifier, name=name
+                            source=source,
+                            source_identifier=identifier,
+                            name=name,
+                            first_name=first_name,
+                            last_name=last_name,
                         )
                     )
                     self._update_contributor_name(db_contributor, name)
+                    self._update_contributor_structured_name(
+                        db_contributor, first_name, last_name
+                    )
                     await self._update_contributor_external_identifiers(
                         db_contributor, ext_identifiers
                     )
@@ -259,11 +268,14 @@ class AbstractReferencesConverter(ABC):
                         )
         return contributor
 
+    # pylint: disable=too-many-arguments
     async def _get_or_create_contributor_by_identifier(
         self,
         source: str,
         source_identifier: str,
         name: str,
+        first_name: str | None = None,
+        last_name: str | None = None,
         new_attempt: bool = False,
     ):
         async with async_session() as session:
@@ -278,6 +290,8 @@ class AbstractReferencesConverter(ABC):
                         source=source,
                         source_identifier=source_identifier,
                         name=name,
+                        first_name=first_name,
+                        last_name=last_name,
                     )
                     session.add(contributor)
                     try:
@@ -294,6 +308,8 @@ class AbstractReferencesConverter(ABC):
                                 source=source,
                                 source_identifier=source_identifier,
                                 name=name,
+                                first_name=first_name,
+                                last_name=last_name,
                                 new_attempt=True,
                             )
                         )
@@ -452,7 +468,8 @@ class AbstractReferencesConverter(ABC):
                         )
         return document_type
 
-    def _update_contributor_name(self, db_contributor: Contributor, name: str):
+    @staticmethod
+    def _update_contributor_name(db_contributor: Contributor, name: str):
         """
         Updates the name of the contributor if it is different from the one in the database
         and stores the old name in the name_variants field
@@ -469,6 +486,43 @@ class AbstractReferencesConverter(ABC):
                 db_contributor.name
             ]
         db_contributor.name = name
+
+    @staticmethod
+    def _update_contributor_structured_name(
+        db_contributor: Contributor, first_name: str, last_name: str
+    ):
+        """
+        Updates the structured name of the contributor if it is different
+        from the one in the database and stores the old structured name
+        in the structured_name_variants field, avoiding duplicates.
+
+        :param db_contributor:
+        :param first_name: new first name received from hal
+        :param last_name: new last name received from hal
+        :return: None
+        """
+        if (
+            db_contributor.first_name == first_name
+            and db_contributor.last_name == last_name
+        ):
+            return
+
+        if (
+            db_contributor.first_name is not None
+            or db_contributor.last_name is not None
+        ):
+            old_name = {
+                "first_name": db_contributor.first_name,
+                "last_name": db_contributor.last_name,
+            }
+
+            if old_name not in db_contributor.structured_name_variants:
+                db_contributor.structured_name_variants = (
+                    db_contributor.structured_name_variants + [old_name]
+                )
+
+        db_contributor.first_name = first_name
+        db_contributor.last_name = last_name
 
     async def _organizations(
         self, organization_informations: List[OrganizationInformations]

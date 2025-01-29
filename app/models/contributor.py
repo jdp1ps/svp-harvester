@@ -16,6 +16,12 @@ class Contributor(BaseModel):
 
     name: str
 
+    first_name: str | None = None
+
+    last_name: str | None = None
+
     name_variants: list[str] = []
+
+    structured_name_variants: list[dict] = []
 
     identifiers: list[ContributorIdentifier] = []

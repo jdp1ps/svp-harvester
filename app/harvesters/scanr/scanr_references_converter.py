@@ -198,6 +198,8 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
                         role=contribution.get("role"),
                     ),
                     name=contribution.get("fullName"),
+                    first_name=contribution.get("firstName"),
+                    last_name=contribution.get("lastName"),
                     identifier=contribution.get(
                         "person", contribution.get("toIdentify")
                     ),

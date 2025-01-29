@@ -17,6 +17,12 @@
         "authQuality_s": [
           "aut"
         ],
+        "authFirstName_s": [
+          "Alessandro"
+        ],
+        "authLastName_s": [
+          "Buccheri"
+        ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Alessandro Buccheri_FacetSep_39236-169647_FacetSep_alessandro-buccheri"
         ],
@@ -41,6 +47,14 @@
           "aut",
           "aut"
         ],
+        "authFirstName_s": [
+          "Alessandro",
+          "Alex"
+        ],
+        "authLastName_s": [
+          "Buccheri",
+          "Terieur"
+        ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Alessandro Buccheri_FacetSep_39236-169647_FacetSep_alessandro-buccheri",
           "Alex Terieur_FacetSep_11111-222222_FacetSep_alex-terieur"
@@ -59,6 +73,14 @@
         "authQuality_s": [
           "aut",
           "aut"
+        ],
+        "authFirstName_s": [
+          "Alessandro",
+          "Alex"
+        ],
+        "authLastName_s": [
+          "Buccheri",
+          "Terieur"
         ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Alessandro Buccheri_FacetSep_39236-169647_FacetSep_alessandro-buccheri",
@@ -79,6 +101,14 @@
           "aut",
           "aut"
         ],
+        "authFirstName_s": [
+          "Alessandro",
+          "Alex"
+        ],
+        "authLastName_s": [
+          "Buccheri",
+          "Terieur"
+        ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Alessandro Buccheri_FacetSep_39236-169647_FacetSep_alessandro-buccheri",
           "Alex Terieur_FacetSep_11111-222222_FacetSep_alex-terieur"
@@ -96,6 +126,12 @@
         ],
         "authQuality_s": [
           "aut"
+        ],
+        "authFirstName_s": [
+          "Arnaud"
+        ],
+        "authLastName_s": [
+          "Dupont"
         ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Arnaud Dupont_FacetSep_153764-0_FacetSep_"
@@ -117,6 +153,12 @@
         "authQuality_s": [
           "aut"
         ],
+        "authFirstName_s": [
+          "Arnaud"
+        ],
+        "authLastName_s": [
+          "Dupont"
+        ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Arnaud Dupont_FacetSep_153764-0_FacetSep_"
         ],
@@ -137,6 +179,14 @@
         "authQuality_s": [
           "aut",
           "scientific_editor"
+        ],
+        "authFirstName_s": [
+          "Arnaud",
+          "Arnaud"
+        ],
+        "authLastName_s": [
+          "Dupont",
+          "Dupont"
         ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Arnaud Dupont_FacetSep_153764-0_FacetSep_",
