@@ -30,6 +30,8 @@ async def test_idref_convert_for_sparql_result(idref_sparql_result_for_doc):
     expected_title = "Insonorisation d'un système de climatisation automobile par contrôle actif du bruit"
     expected_document_type = "Work"
     expected_auth_name = "Jean-Louis Abatut"
+    expected_auth_first_name = "Jean-Louis"
+    expected_auth_last_name = "Abatut"
 
     test_reference = converter_under_tests.build(
         raw_data=idref_sparql_result_for_doc,
@@ -48,6 +50,13 @@ async def test_idref_convert_for_sparql_result(idref_sparql_result_for_doc):
     )
     assert len(test_reference.contributions) == 1
     assert expected_auth_name == test_reference.contributions[0].contributor.name
+    assert (
+        expected_auth_first_name
+        == test_reference.contributions[0].contributor.first_name
+    )
+    assert (
+        expected_auth_last_name == test_reference.contributions[0].contributor.last_name
+    )
     assert len(test_reference.identifiers) == 3
     assert test_reference.identifiers[0].value == basic_idref_source_identifier
     assert test_reference.identifiers[1].value in equivalent_identifiers
