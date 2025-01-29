@@ -25,6 +25,10 @@
           "type": "uri",
           "value": "http://id.loc.gov/vocabulary/relators/aut"
         },
+        "date": {
+          "type": "literal",
+          "value": "2011"
+        },
         "type": {
           "type": "uri",
           "value": "http://purl.org/vocab/frbr/core#Work"

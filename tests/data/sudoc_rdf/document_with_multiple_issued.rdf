@@ -1,0 +1,84 @@
+<!--ISSN = False-->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bibo="http://purl.org/ontology/bibo/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/" xmlns:marcrel="http://id.loc.gov/vocabulary/relators/"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:isbd="http://iflastandards.info/ns/isbd/elements/"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:rdaelements="http://rdvocab.info/Elements/" xmlns:rdau="http://rdaregistry.info/Elements/u/"
+         xmlns:rdam="http://rdaregistry.info/Elements/m/" xmlns:bnf-onto="http://data.bnf.fr/ontology/bnf-onto/"
+         xmlns:gn="http://www.geonames.org/ontology">
+    <bibo:Document rdf:about="http://www.sudoc.fr/082306389">
+        <foaf:primaryTopic rdf:resource="http://www.sudoc.fr/082306389/id"></foaf:primaryTopic>
+        <dcterms:identifier>082306389</dcterms:identifier>
+        <dcterms:creator rdf:resource="http://www.idref.fr/033702462/id"></dcterms:creator>
+        <dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2004-07-08</dcterms:created>
+        <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2024-10-22T10:42:36
+        </dcterms:modified>
+    </bibo:Document>
+    <bibo:Book rdf:about="http://www.sudoc.fr/082306389/id"><!--content form (isbd), media type (rda)-->
+        <isbd:P1001>
+            <skos:Concept rdf:about="http://iflastandards.info/ns/isbd/terms/contentform/T1009">
+                <skos:prefLabel xml:lang="en">text</skos:prefLabel>
+            </skos:Concept>
+        </isbd:P1001><!--rda:content type-->
+        <rdau:P60049>
+            <skos:Concept rdf:about="http://rdaregistry.info/termList/RDAContentType/1020">
+                <skos:prefLabel xml:lang="en">text</skos:prefLabel>
+            </skos:Concept>
+        </rdau:P60049>
+        <dc:type>Text</dc:type><!--media type-->
+        <isbd:P1003>
+            <skos:Concept rdf:about="http://iflastandards.info/ns/isbd/terms/mediatype/T1010">
+                <skos:prefLabel xml:lang="en">unmediated</skos:prefLabel>
+            </skos:Concept>
+        </isbd:P1003><!--carrier type-->
+        <rdau:P60048>
+            <skos:Concept rdf:about="http://rdaregistry.info/termList/RDACarrierType/1049">
+                <skos:prefLabel xml:lang="fr">volume</skos:prefLabel>
+                <skos:prefLabel xml:lang="en">volume</skos:prefLabel>
+            </skos:Concept>
+        </rdau:P60048>
+        <dcterms:language rdf:resource="http://lexvo.org/id/iso639-3/fra"></dcterms:language>
+        <dcterms:language rdf:resource="eng"></dcterms:language>
+        <dcterms:language rdf:resource="ger"></dcterms:language>
+        <gn:countryCode>FR</gn:countryCode>
+        <bibo:isbn10>2912688426</bibo:isbn10>
+        <bnf-onto:FRBNF>39208563</bnf-onto:FRBNF>
+        <!--data.bnf.fr-->
+        <owl:sameAs rdf:resource="http://data.bnf.fr/ark:/12148/cb392085635"></owl:sameAs>
+        <dc:title>Yann Toma, &quot;Ouest-Lumière&quot; / texte de Paul Ardenne ; English transl., Sally Laruelle,
+            deutsche Übersetzung, Heinke Wagner
+        </dc:title><!--rda elements obsolète : voir rdam:P30003-->
+        <rdaelements:modeOfIssuance>
+            <skos:Concept rdf:about="http://RDVocab.info/termLIst/ModeIssue/1001">
+                <skos:prefLabel xml:lang="en">Single unit</skos:prefLabel>
+            </skos:Concept>
+        </rdaelements:modeOfIssuance><!--mode of issuance-->
+        <rdam:P30003>
+            <skos:Concept rdf:about="http://RDVocab.info/termLIst/ModeIssue/1001">
+                <skos:prefLabel xml:lang="en">Single unit</skos:prefLabel>
+            </skos:Concept>
+        </rdam:P30003>
+        <dc:date>2004</dc:date>
+        <dc:date>2006</dc:date>
+        <dc:publisher>Paris : Isthme éditions , 2004</dc:publisher>
+        <dc:publisher>Paris : Isthme éditions , 2004</dc:publisher>
+        <dc:format>1 vol. (107 p.) : ill. en noir et en coul. ; 22 cm</dc:format>
+        <marcrel:aut>
+            <foaf:Person rdf:about="http://www.idref.fr/028747739/id">
+                <foaf:name>Ardenne, Paul (1956-....)</foaf:name>
+            </foaf:Person>
+        </marcrel:aut>
+        <marcrel:trl>
+            <foaf:Person rdf:about="http://www.idref.fr/078064139/id">
+                <foaf:name>Laruelle, Sally (19..-....)</foaf:name>
+            </foaf:Person>
+        </marcrel:trl>
+        <marcrel:trl>
+            <foaf:Person rdf:about="http://www.idref.fr/082328684/id">
+                <foaf:name>Wagner, Heinke (19..-....)</foaf:name>
+            </foaf:Person>
+        </marcrel:trl>
+    </bibo:Book>
+</rdf:RDF>

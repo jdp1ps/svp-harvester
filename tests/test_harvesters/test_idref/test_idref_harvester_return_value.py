@@ -1,3 +1,4 @@
+import datetime
 from unittest import mock
 
 import aiosparql.client
@@ -79,6 +80,7 @@ async def test_idref_harvester_finds_doc(
         )
         for subject in reference.subjects
     )
+    assert reference.issued == datetime.date(2011, 1, 1)
 
 
 @pytest.mark.integration

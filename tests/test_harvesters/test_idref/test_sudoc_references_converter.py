@@ -35,6 +35,7 @@ async def test_convert_for_rdf_result(
     expected_issn = "1954-6009"
     expected_issn_l = "1954-6009"
     expected_created_date = datetime.date(2016, 6, 13)
+    expected_issued_date = datetime.date(2016, 1, 1)
 
     test_reference = converter_under_tests.build(
         raw_data=sudoc_rdf_result_for_doc, harvester_version=VersionInfo.parse("0.0.0")
@@ -75,6 +76,7 @@ async def test_convert_for_rdf_result(
     assert expected_issn in test_reference.issue.journal.issn
     assert test_reference.issue.journal.issn_l == expected_issn_l
     assert test_reference.created == expected_created_date
+    assert test_reference.issued == expected_issued_date
 
 
 @pytest.mark.asyncio
@@ -159,6 +161,50 @@ async def test_convert_with_invalid_date_format(
     assert test_reference.created is None
     assert "Sudoc reference converter cannot create" in caplog.text
     assert "Could not parse date" in caplog.text
+
+
+async def test_convert_with_empty_issued_date(
+    sudoc_rdf_result_for_doc_with_empty_issued,
+):
+    """
+    GIVEN a SudocReferencesConverter instance and a Sudoc RDF result with an empty issued date
+    WHEN the convert method is called
+    THEN it should return a Reference instance with the expected values
+    """
+    converter_under_tests = SudocReferencesConverter()
+
+    test_reference = converter_under_tests.build(
+        raw_data=sudoc_rdf_result_for_doc_with_empty_issued,
+        harvester_version=VersionInfo.parse("0.0.0"),
+    )
+
+    await converter_under_tests.convert(
+        raw_data=sudoc_rdf_result_for_doc_with_empty_issued, new_ref=test_reference
+    )
+
+    assert test_reference.issued is None
+
+
+async def test_convert_with_multiple_issued_date(
+    sudoc_rdf_result_for_doc_with_multiple_issued,
+):
+    """
+    GIVEN a SudocReferencesConverter instance and a Sudoc RDF result with multiple issued date
+    WHEN the convert method is called
+    THEN it should return a Reference instance with the last issued date
+    """
+    converter_under_tests = SudocReferencesConverter()
+
+    test_reference = converter_under_tests.build(
+        raw_data=sudoc_rdf_result_for_doc_with_multiple_issued,
+        harvester_version=VersionInfo.parse("0.0.0"),
+    )
+
+    await converter_under_tests.convert(
+        raw_data=sudoc_rdf_result_for_doc_with_multiple_issued, new_ref=test_reference
+    )
+
+    assert test_reference.issued == datetime.date(2006, 1, 1)
 
 
 async def test_convert_thesis_with(sudoc_rdf_result_for_thesis):

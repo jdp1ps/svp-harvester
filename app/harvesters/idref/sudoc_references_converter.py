@@ -58,6 +58,7 @@ class SudocReferencesConverter(AbesRDFReferencesConverter):
             )
 
         self._add_created_date(raw_data.payload, raw_data.source_identifier, new_ref)
+        self._add_issued_date(raw_data.payload, raw_data.source_identifier, new_ref)
 
         self._add_manifestations(raw_data.payload, raw_data.source_identifier, new_ref)
 
@@ -193,6 +194,21 @@ class SudocReferencesConverter(AbesRDFReferencesConverter):
                 logger.error(
                     f"Sudoc reference converter cannot create created date from DCTERMS.created in"
                     f" {uri}: {error}"
+                )
+
+    def _add_issued_date(self, pub_graph, uri, new_ref):
+        # we fecth the cd:date field if present : it may occur multiple times and the date is
+        # often limited to the year
+        for issued in pub_graph.objects(rdflib.term.URIRef(uri), DC.date):
+            # date is in the form of "yyyy"
+            year_date_string = issued.value
+            try:
+                # isodate will convert it to "yyyy-01-01"
+                new_ref.issued = check_valid_iso8601_date(year_date_string)
+            except UnexpectedFormatException as error:
+                logger.error(
+                    f"Sudoc reference converter cannot create issued date from"
+                    f" dateOfPrintPublication in {uri}: {error}"
                 )
 
     async def _document_type(self, pub_graph, uri):

@@ -82,6 +82,7 @@ class IdrefSparqlClient:
                     publications[pub] = {
                         "uri": pub,
                         "role": result.get("role", {}).get("value", ""),
+                        "date": result.get("date", {}).get("value", ""),
                         "contributors": {},  # Use a dictionary for contributors
                         "title": [],
                         "note": [],

@@ -1,3 +1,4 @@
+from loguru import logger
 from rdflib import FOAF, URIRef
 from semver import Version
 
@@ -7,6 +8,9 @@ from app.db.models.reference_identifier import ReferenceIdentifier
 from app.db.models.subtitle import Subtitle
 from app.db.models.title import Title
 from app.harvesters.abstract_references_converter import AbstractReferencesConverter
+from app.harvesters.exceptions.unexpected_format_exception import (
+    UnexpectedFormatException,
+)
 from app.harvesters.idref.idref_document_type_converter import (
     IdrefDocumentTypeConverter,
 )
@@ -17,6 +21,7 @@ from app.harvesters.sparql_harvester_raw_result import (
 )
 from app.services.concepts.concept_informations import ConceptInformations
 from app.services.hash.hash_key import HashKey
+from app.utilities.date_utilities import check_valid_iso8601_date
 
 
 class IdrefBasicReferencesConverter(AbstractReferencesConverter):
@@ -33,6 +38,7 @@ class IdrefBasicReferencesConverter(AbstractReferencesConverter):
     async def convert(self, raw_data: SparqlRawResult, new_ref: Reference) -> None:
         dict_payload: dict = raw_data.payload
         uri = raw_data.source_identifier
+        self._fetch_issued_date(new_ref, dict_payload, uri)
         for title in dict_payload["title"]:
             new_ref.titles.append(Title(value=title, language="fr"))
         for subtitle in dict_payload["altLabel"]:
@@ -66,6 +72,17 @@ class IdrefBasicReferencesConverter(AbstractReferencesConverter):
             new_ref.identifiers.append(
                 ReferenceIdentifier(value=equivalent, type="uri")
             )
+
+    def _fetch_issued_date(self, new_ref, dict_payload, uri):
+        issued_date = dict_payload.get("date", None)
+        if issued_date is not None:
+            try:
+                new_ref.issued = check_valid_iso8601_date(issued_date)
+            except UnexpectedFormatException:
+                logger.error(
+                    f"Idref reference converter cannot create issued date from"
+                    f" {issued_date} for reference {uri}"
+                )
 
     def hash_keys(self, harvester_version: Version) -> list[HashKey]:
         return [
