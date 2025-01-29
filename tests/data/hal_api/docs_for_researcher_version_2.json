@@ -34,6 +34,12 @@
         "authQuality_s": [
           "aut"
         ],
+        "authFirstName_s": [
+          "Alessandro"
+        ],
+        "authLastName_s": [
+          "Bucchieri"
+        ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Alessandro Buccheri_FacetSep_39236-169647_FacetSep_alessandro-buccheri"
         ],
@@ -75,6 +81,14 @@
         "authQuality_s": [
           "aut",
           "aut"
+        ],
+        "authFirstName_s": [
+          "Manon",
+          "Alessandro"
+        ],
+        "authLastName_s": [
+          "Brouillet",
+          "Buccheri"
         ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Manon Brouillet_FacetSep_31153-172318_FacetSep_manon-brouillet",
@@ -131,6 +145,12 @@
         ],
         "authQuality_s": [
           "aut"
+        ],
+        "authFirstName_s": [
+          "Alessandro"
+        ],
+        "authLastName_s": [
+          "Bucchieri"
         ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Alessandro Buccheri_FacetSep_39236-169647_FacetSep_alessandro-buccheri"

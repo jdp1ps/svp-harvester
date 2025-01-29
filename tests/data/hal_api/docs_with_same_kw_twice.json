@@ -31,6 +31,18 @@
           "aut",
           "aut"
         ],
+        "authFirstName_s": [
+          "Lionel",
+          "Gianluca",
+          "Roberta",
+          "Nadia"
+        ],
+        "authLastName_s": [
+          "Fontagné",
+          "Orefice",
+          "Piermartini",
+          "Rocha"
+        ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Lionel Fontagné_FacetSep_6574-6113_FacetSep_lionelfontagne",
           "Gianluca Orefice_FacetSep_951488-0_FacetSep_",
@@ -88,6 +100,16 @@
           "aut",
           "aut",
           "aut"
+        ],
+        "authFirstName_s": [
+          "Lionel",
+          "Jean",
+          "Alexander"
+        ],
+        "authLastName_s": [
+          "Bucchieri",
+          "Fouré",
+          "Keck"
         ],
         "authFullNameFormIDPersonIDIDHal_fs": [
           "Lionel Fontagné_FacetSep_6574-6113_FacetSep_lionelfontagne",

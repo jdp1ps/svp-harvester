@@ -27,6 +27,8 @@ class HalApiQueryBuilder:
         "*_keyword_s",
         "authIdForm_i",
         "authFullNameFormIDPersonIDIDHal_fs",
+        "authLastName_s",
+        "authFirstName_s",
         "authQuality_s",
         "docType_s",
         "docSubType_s",

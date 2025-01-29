@@ -100,7 +100,11 @@ class AbstractReferencesConverter(ABC):
                 if identifier is not None:
                     db_contributor = (
                         await self._get_or_create_contributor_by_identifier(
-                            source=source, source_identifier=identifier, name=name
+                            source=source,
+                            source_identifier=identifier,
+                            name=name,
+                            first_name=first_name,
+                            last_name=last_name,
                         )
                     )
                     self._update_contributor_name(db_contributor, name)
@@ -264,11 +268,14 @@ class AbstractReferencesConverter(ABC):
                         )
         return contributor
 
+    # pylint: disable=too-many-arguments
     async def _get_or_create_contributor_by_identifier(
         self,
         source: str,
         source_identifier: str,
         name: str,
+        first_name: str | None = None,
+        last_name: str | None = None,
         new_attempt: bool = False,
     ):
         async with async_session() as session:
@@ -283,6 +290,8 @@ class AbstractReferencesConverter(ABC):
                         source=source,
                         source_identifier=source_identifier,
                         name=name,
+                        first_name=first_name,
+                        last_name=last_name,
                     )
                     session.add(contributor)
                     try:
@@ -299,6 +308,8 @@ class AbstractReferencesConverter(ABC):
                                 source=source,
                                 source_identifier=source_identifier,
                                 name=name,
+                                first_name=first_name,
+                                last_name=last_name,
                                 new_attempt=True,
                             )
                         )
