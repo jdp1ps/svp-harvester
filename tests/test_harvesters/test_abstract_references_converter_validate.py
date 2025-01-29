@@ -80,7 +80,15 @@ def fixture_reference_with_all_fields():
                     source="I am a source",
                     source_identifier="I am a source identifier",
                     name="I am a name",
+                    first_name="I am a first name",
+                    last_name="I am a last name",
                     name_variants=["I am a name variant"],
+                    structured_name_variants=[
+                        {
+                            "first_name": "I am a first name variant",
+                            "last_name": "I am a last name variant",
+                        }
+                    ],
                 ),
             )
         ],
