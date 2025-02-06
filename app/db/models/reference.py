@@ -139,6 +139,8 @@ class Reference(Base, VersionedRecord):
     page: Mapped[str] = mapped_column(nullable=True, index=True)
 
     issued: Mapped[datetime] = mapped_column(nullable=True, index=True)
+    # raw_issued preserves original date as string
+    raw_issued: Mapped[str] = mapped_column(nullable=True)
     created: Mapped[datetime] = mapped_column(nullable=True, index=True)
 
     @validates("harvester_version")

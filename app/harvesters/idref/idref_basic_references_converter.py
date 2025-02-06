@@ -77,6 +77,7 @@ class IdrefBasicReferencesConverter(AbstractReferencesConverter):
         issued_date = dict_payload.get("date", None)
         if issued_date is not None:
             try:
+                new_ref.raw_issued = issued_date
                 new_ref.issued = check_valid_iso8601_date(issued_date)
             except UnexpectedFormatException:
                 logger.error(

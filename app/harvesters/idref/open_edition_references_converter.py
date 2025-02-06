@@ -221,6 +221,7 @@ class OpenEditionReferencesConverter(AbstractReferencesConverter):
     def _get_issued_date(self, root: ElementTree, new_ref: Reference):
         issued = self._get_term(root, "issued")
         try:
+            new_ref.raw_issued = issued
             new_ref.issued = check_valid_iso8601_date(issued)
         except UnexpectedFormatException as error:
             logger.error(

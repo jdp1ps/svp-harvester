@@ -203,6 +203,7 @@ class SudocReferencesConverter(AbesRDFReferencesConverter):
             # date is in the form of "yyyy"
             year_date_string = issued.value
             try:
+                new_ref.raw_issued = year_date_string
                 # isodate will convert it to "yyyy-01-01"
                 new_ref.issued = check_valid_iso8601_date(year_date_string)
             except UnexpectedFormatException as error:

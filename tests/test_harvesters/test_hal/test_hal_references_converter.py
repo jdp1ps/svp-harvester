@@ -56,6 +56,7 @@ async def test_convert(hal_api_cleaned_response):  # pylint: disable=too-many-lo
     expected_contributor_source_identifier = "10227"
     expected_references_identifier_types = ["hal", "doi"]
     expected_references_identifier_values = ["halshs-01387023", "doi/1234"]
+    expected_raw_issued_date = "2016"
     expected_issued_date = datetime.datetime(2016, 1, 1, 0, 0)
     expected_created_date = datetime.datetime(2016, 1, 1, 0, 0)
     for doc in hal_api_cleaned_response:
@@ -81,6 +82,7 @@ async def test_convert(hal_api_cleaned_response):  # pylint: disable=too-many-lo
         assert test_subjects == expected_subjects
         assert test_subtitles == expected_subtitles
         assert test_abstracts == expected_abstracts
+        assert test_reference.raw_issued == expected_raw_issued_date
         assert test_reference.issued == expected_issued_date
         assert test_reference.created == expected_created_date
         assert len(test_reference.contributions) == expected_contributors_number

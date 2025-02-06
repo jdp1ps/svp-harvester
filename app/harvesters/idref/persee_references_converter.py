@@ -217,9 +217,10 @@ class PerseeReferencesConverter(AbesRDFReferencesConverter):
                 "http://data.persee.fr/ontology/persee-ontology/dateOfPrintPublication"
             ),
         ):
-            date_string = issued.value
+            date_obj = issued.value
             try:
-                new_ref.issued = check_valid_iso8601_date(date_string)
+                new_ref.raw_issued = date_obj.strftime("%Y-%m-%d")
+                new_ref.issued = check_valid_iso8601_date(date_obj)
             except UnexpectedFormatException as error:
                 logger.error(
                     f"Persee reference converter cannot create issued date from"

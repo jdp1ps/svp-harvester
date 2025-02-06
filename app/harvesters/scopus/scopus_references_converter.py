@@ -266,6 +266,7 @@ class ScopusReferencesConverter(AbstractReferencesConverter):
     def _add_issued_date(self, entry: Element, new_ref: Reference):
         issued = self._get_element(entry, "prism:coverDate")
         try:
+            new_ref.raw_issued = issued.text
             new_ref.issued = check_valid_iso8601_date(issued.text)
         except UnexpectedFormatException as error:
             logger.error(

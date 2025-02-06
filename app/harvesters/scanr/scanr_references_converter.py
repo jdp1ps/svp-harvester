@@ -115,6 +115,7 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
 
     def _add_issued_date(self, issue, json_payload, new_ref):
         try:
+            new_ref.raw_issued = issue
             new_ref.issued = check_valid_iso8601_date(issue)
         except UnexpectedFormatException as error:
             logger.error(

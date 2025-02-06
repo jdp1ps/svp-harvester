@@ -35,6 +35,7 @@ async def test_convert_for_rdf_result(
     expected_issn = "1954-6009"
     expected_issn_l = "1954-6009"
     expected_created_date = datetime.date(2016, 6, 13)
+    expected_raw_issued_date = "2016"
     expected_issued_date = datetime.date(2016, 1, 1)
 
     test_reference = converter_under_tests.build(
@@ -76,6 +77,7 @@ async def test_convert_for_rdf_result(
     assert expected_issn in test_reference.issue.journal.issn
     assert test_reference.issue.journal.issn_l == expected_issn_l
     assert test_reference.created == expected_created_date
+    assert test_reference.raw_issued == expected_raw_issued_date
     assert test_reference.issued == expected_issued_date
 
 
