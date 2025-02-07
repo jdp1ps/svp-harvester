@@ -89,6 +89,7 @@ async def test_publish_created_reference(
                 "issue": None,
                 "page": None,
                 "book": None,
+                "raw_issued": "2017",
                 "issued": "2017-01-01 00:00:00",
                 "created": "2018-02-02 10:00:00",
                 "version": 0,

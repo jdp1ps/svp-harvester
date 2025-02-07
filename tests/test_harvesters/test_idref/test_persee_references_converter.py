@@ -37,7 +37,7 @@ async def test_persee_convert_for_rdf_result(persee_rdf_result_for_doc):
     expected_volume = "18"
     expected_journal_title = "Cahiers du Centre Gustave Glotz, 18, 2007."
     expected_publisher = "Paris : Centre Gustave Glotz"
-    expected_raw_issued_date = "1998-01-01"
+    expected_raw_issued_date = "1998"
     expected_issued_date = datetime.date(1998, 1, 1)
     expected_created_date = datetime.date(2021, 6, 23)
 
