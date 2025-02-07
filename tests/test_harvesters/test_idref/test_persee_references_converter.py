@@ -37,7 +37,7 @@ async def test_persee_convert_for_rdf_result(persee_rdf_result_for_doc):
     expected_volume = "18"
     expected_journal_title = "Cahiers du Centre Gustave Glotz, 18, 2007."
     expected_publisher = "Paris : Centre Gustave Glotz"
-
+    expected_raw_issued_date = "1998"
     expected_issued_date = datetime.date(1998, 1, 1)
     expected_created_date = datetime.date(2021, 6, 23)
 
@@ -52,7 +52,6 @@ async def test_persee_convert_for_rdf_result(persee_rdf_result_for_doc):
         "Paris, Sorbonne, Law School, Faculty of Medicine, Faculty of Pharmacy.",
         "architectural decor, France, 18th-20th centuries",
     ]
-
 
     test_reference = converter_under_tests.build(
         raw_data=persee_rdf_result_for_doc, harvester_version=VersionInfo.parse("0.0.0")
@@ -76,6 +75,7 @@ async def test_persee_convert_for_rdf_result(persee_rdf_result_for_doc):
     assert expected_volume == test_reference.issue.volume
     assert expected_journal_title in test_reference.issue.journal.titles
     assert test_reference.issue.journal.publisher == expected_publisher
+    assert test_reference.raw_issued == expected_raw_issued_date
     assert test_reference.issued == expected_issued_date
     assert test_reference.created == expected_created_date
     assert expected_publisher == test_reference.issue.journal.publisher
@@ -87,7 +87,7 @@ async def test_persee_convert_for_rdf_result(persee_rdf_result_for_doc):
 
     assert test_subjects == expected_subjects
 
-    
+
 @pytest.mark.parametrize(
     "fixture, tested_field, expected_output",
     [

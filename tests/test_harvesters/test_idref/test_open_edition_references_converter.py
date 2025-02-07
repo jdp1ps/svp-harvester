@@ -1,4 +1,5 @@
 import datetime
+
 import pytest
 from semver import VersionInfo
 
@@ -38,6 +39,7 @@ async def test_open_edition_convert_for_rfd_result(
     expected_publisher = "L’Harmattan"
     expected_journal_title = "Cultures & conflits"
     expected_issue_rights = "https://creativecommons.org/licenses/by-nc-nd/4.0/"
+    expected_raw_issued_date = "2003-01-02T00:00:00Z"
     expected_issued_date = datetime.datetime(2003, 1, 2, 0, 0)
     expected_created_date = datetime.date(1992, 1, 1)
 
@@ -58,6 +60,7 @@ async def test_open_edition_convert_for_rfd_result(
     assert expected_publisher == test_reference.issue.journal.publisher
     assert expected_journal_title in test_reference.issue.journal.titles
     assert expected_issue_rights == test_reference.issue.rights
+    assert test_reference.raw_issued == expected_raw_issued_date
     assert test_reference.issued == expected_issued_date
     assert test_reference.created == expected_created_date
 

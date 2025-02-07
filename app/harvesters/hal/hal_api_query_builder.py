@@ -33,6 +33,7 @@ class HalApiQueryBuilder:
         "docType_s",
         "docSubType_s",
         "publicationDate_tdate",
+        "publicationDate_s",
         "producedDate_tdate",
         "citationFull_s",
         "citationRef_s",

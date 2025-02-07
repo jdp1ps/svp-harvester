@@ -114,8 +114,9 @@ class ScanrReferencesConverter(AbstractReferencesConverter):
             new_ref.identifiers.append(identifier)
 
     def _add_issued_date(self, issue, json_payload, new_ref):
+        new_ref.raw_issued = issue
         try:
-            new_ref.issued = check_valid_iso8601_date(issue)
+            new_ref.issued = check_valid_iso8601_date(new_ref.raw_issued)
         except UnexpectedFormatException as error:
             logger.error(
                 f"ScanR reference converter cannot create issued date from publicationDate in"

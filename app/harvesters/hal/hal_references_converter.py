@@ -156,6 +156,7 @@ class HalReferencesConverter(AbstractReferencesConverter):
 
     def _add_issued_date(self, json_payload, new_ref):
         try:
+            new_ref.raw_issued = json_payload.get("publicationDate_s", None)
             new_ref.issued = check_valid_iso8601_date(
                 json_payload.get("publicationDate_tdate", None)
             )
@@ -406,6 +407,7 @@ class HalReferencesConverter(AbstractReferencesConverter):
             HashKey("labStructId_i"),
             HashKey("docType_s"),
             HashKey("publicationDate_tdate"),
+            HashKey("publicationDate_s"),
             HashKey("producedDate_tdate"),
         ]
 

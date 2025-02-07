@@ -22,6 +22,7 @@
         "docType_s": "ART",
         "page_s": "051910",
         "volume_s": "67",
+        "publicationDate_s": "2003",
         "producedDate_tdate": "2003-01-01T00:00:00Z",
         "publicationDate_tdate": "2003-01-01T00:00:00Z"
       },
@@ -51,6 +52,7 @@
         "doiId_s": "10.1103/PhysRevB.80.195406",
         "arxivId_s": "0912.3058",
         "producedDate_tdate": "2009-11-05T00:00:00Z",
+        "publicationDate_s": "2009-11-05",
         "publicationDate_tdate": "2009-11-05T00:00:00Z",
         "fileMain_s": "https://hal.science/hal-00440439/document",
         "files_s": [
@@ -85,6 +87,7 @@
         "volume_s": "119",
         "doiId_s": "10.1021/jp511070h",
         "producedDate_tdate": "2015-01-01T00:00:00Z",
+        "publicationDate_s": "2015",
         "publicationDate_tdate": "2015-01-01T00:00:00Z",
         "fileMain_s": "https://hal.science/hal-01115164/document",
         "files_s": [
@@ -109,6 +112,7 @@
         "uri_s": "https://hal.science/hal-01309285",
         "docType_s": "ART",
         "producedDate_tdate": "2016-01-01T00:00:00Z",
+        "publicationDate_s": "2016",
         "publicationDate_tdate": "2016-01-01T00:00:00Z"
       }
     ]
