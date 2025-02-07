@@ -20,7 +20,12 @@ class Reference(BaseModel):
     Pydantic model matching Reference sql_alchemy model
     """
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={
+            datetime: lambda dt: dt.isoformat()
+        },  # Ensures ISO 8601 formatting
+    )
 
     source_identifier: str
     harvester: str
